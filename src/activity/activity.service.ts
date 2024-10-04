@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Activity } from './entities/activity.entity';
-import { CreateActivityDto } from './dtto/create-activitty.dto';
-import { UpdateActivityDto } from './dtto/update-activity.dto';
+import { CreateActivityDto } from './dto/create-activitty.dto';
+import { UpdateActivityDto } from './dto/update-activity.dto';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()

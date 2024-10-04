@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { Activity } from './entities/activity.entity';
-import { CreateActivityDto } from './dtto/create-activitty.dto';
-import { UpdateActivityDto } from './dtto/update-activity.dto';
+import { CreateActivityDto } from './dto/create-activitty.dto';
+import { UpdateActivityDto } from './dto/update-activity.dto';
 
 @Controller('activities')
 export class ActivityController {
