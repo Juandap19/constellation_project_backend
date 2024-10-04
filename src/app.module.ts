@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TeacherModule } from './users/teacher/teacher.module';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,6 +25,10 @@ import { AppService } from './app.service';
         rejectUnauthorized: false, // Permite conexiones sin verificar el certificado, útil en desarrollo
       }
     }),
+
+    TeacherModule,
+
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
