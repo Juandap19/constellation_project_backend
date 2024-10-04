@@ -20,18 +20,43 @@ export class TeacherService {
   }
 
   findAll() {
-    return `This action returns all teacher`;
+    return this.teacherRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} teacher`;
+  async findOne(id: string) {
+    const teacher = await this.teacherRepository.findOne({ where: { id } });
+    if (!teacher) {
+      throw new NotFoundException(`Teacher with id ${id} not found`);
+    }
+    return teacher;
   }
 
-  update(id: number, updateTeacherDto: UpdateTeacherDto) {
-    return `This action updates a #${id} teacher`;
+  async update(id: string, updateTeacherDto: UpdateTeacherDto) {
+    const teacherUpdate = await this.findOne(id);
+
+    if (!teacherUpdate) {
+      throw new NotFoundException(`Teacher with id ${id} not found`);
+    }
+
+    Object.assign(teacherUpdate, updateTeacherDto);
+    const updatedTeacher = await this.teacherRepository.save(teacherUpdate);
+    return {
+        message: `Teacher with ID #${id} has been updated successfully`,
+        teacher: updatedTeacher,
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} teacher`;
+  async remove(id: string) {
+    const teacherDelete = await this.findOne(id);
+
+    if (!teacherDelete) {
+      throw new NotFoundException(`Teacher with id ${id} not found`);
+    }
+
+    const deletedTeacher = await this.teacherRepository.delete(teacherDelete);
+    return {
+        message: `Teacher with ID #${id} has been deleted successfully`,
+        teacher: deletedTeacher,
+    };
   }
 }
