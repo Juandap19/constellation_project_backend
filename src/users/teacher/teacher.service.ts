@@ -40,10 +40,7 @@ export class TeacherService {
 
     Object.assign(teacherUpdate, updateTeacherDto);
     const updatedTeacher = await this.teacherRepository.save(teacherUpdate);
-    return {
-        message: `Teacher with ID #${id} has been updated successfully`,
-        teacher: updatedTeacher,
-    };
+    return updatedTeacher;
   }
 
   async remove(id: string) {
@@ -54,9 +51,6 @@ export class TeacherService {
     }
 
     const deletedTeacher = await this.teacherRepository.delete(teacherDelete);
-    return {
-        message: `Teacher with ID #${id} has been deleted successfully`,
-        teacher: deletedTeacher,
-    };
+    return deletedTeacher;
   }
 }
