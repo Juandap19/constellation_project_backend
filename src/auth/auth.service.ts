@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,12 +9,14 @@ import { BadRequestException, InternalServerErrorException } from '@nestjs/commo
 import { v4 as uuid } from 'uuid';
 import { isUUID } from 'class-validator';
 import { NotFoundException } from '@nestjs/common';
+import { LoginUserDto } from './dto/login-user.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
 
   constructor(
-    @InjectRepository(Users) private readonly userRepository: Repository<Users>
+    @InjectRepository(Users) private readonly userRepository: Repository<Users>, private readonly jwtService: JwtService
 ) {}
 
 async createUser(createUserDto: CreateUserDto) {
@@ -93,5 +95,21 @@ async createUser(createUserDto: CreateUserDto) {
     }
 
     throw new InternalServerErrorException('Error creating user');
-}
+  }
+
+  async  loginUser(loginUserDto: LoginUserDto){
+    const {email, password} = loginUserDto;
+    const user = await this.userRepository.findOne({
+        where: {email}, 
+        select: ['id', 'email', 'password']
+        });
+    if(!user || !bcrypt.compareSync(password, user.password)) 
+        throw new UnauthorizedException('Invalid credentials');
+
+    
+    return { user_id: user.id, email: user.email,
+        token: this.jwtService.sign({user_id: user.id})
+    };
+  }
+
 }
