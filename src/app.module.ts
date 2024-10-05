@@ -4,6 +4,7 @@ import { TeacherModule } from './users/teacher/teacher.module';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CoursesModule } from './courses/courses.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -25,9 +26,8 @@ import { AuthModule } from './auth/auth.module';
         rejectUnauthorized: false, // Permite conexiones sin verificar el certificado, útil en desarrollo
       }
     }),
-
+    CoursesModule,
     TeacherModule,
-
     AuthModule,
   ],
   controllers: [AppController],
