@@ -10,4 +10,5 @@ export class CreateActivityDto {
 
   @IsString()
   readonly description: string;
+
 }

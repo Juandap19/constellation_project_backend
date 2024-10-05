@@ -1,3 +1,4 @@
+import { Rubric } from '../../rubric/entities/rubric.entity';
 import { Course } from 'src/courses/entities/course.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn } from 'typeorm';
 
@@ -11,6 +12,9 @@ export class Activity {
 
   @Column()
   name: string;
+
+  @OneToOne(() => Rubric, rubric => rubric.activity)
+  rubric: Rubric;
 
   @ManyToOne(() => Course, (course) => course.activities)
   @JoinColumn({ name: 'course_id' })

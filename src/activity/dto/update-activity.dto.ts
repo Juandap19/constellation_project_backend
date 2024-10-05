@@ -17,4 +17,5 @@ export class UpdateActivityDto {
   @IsString()
   @IsOptional()
   readonly description?: string;
+
 }
