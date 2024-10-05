@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TeacherModule } from './users/teacher/teacher.module';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -27,7 +26,6 @@ import { ActivityModule } from './activity/activity.module';
       },
     }),
     CoursesModule,
-    TeacherModule,
     AuthModule,
 
     ActivityModule,

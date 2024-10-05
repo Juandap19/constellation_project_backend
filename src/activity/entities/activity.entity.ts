@@ -10,4 +10,5 @@ export class Activity {
 
   @Column()
   name: string;
+  
 }
