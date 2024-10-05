@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UpdateActivityDto {
   @IsString()
@@ -12,4 +12,5 @@ export class UpdateActivityDto {
   @IsString()
   @IsOptional()
   readonly description?: string;
+
 }

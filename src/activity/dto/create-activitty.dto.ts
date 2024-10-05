@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 
 export class CreateActivityDto {
   @IsString()
@@ -6,4 +6,5 @@ export class CreateActivityDto {
 
   @IsString()
   readonly description: string;
+
 }

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Rubric } from '../../rubric/entities/rubric.entity';
 
 @Entity()
 export class Activity {
@@ -10,4 +11,7 @@ export class Activity {
 
   @Column()
   name: string;
+
+  @OneToOne(() => Rubric, rubric => rubric.activity)
+  rubric: Rubric;
 }
