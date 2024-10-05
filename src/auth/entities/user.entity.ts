@@ -19,7 +19,7 @@ export class Users {
     @Column('text')
     last_name: string;
 
-    @Column('text')
+    @Column('text', {default: 'student'})
     role: string;
 
     @Column('text')
