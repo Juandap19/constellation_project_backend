@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Activity } from "src/activity/entities/activity.entity";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 
 @Entity()
 export class Course {
@@ -6,4 +7,6 @@ export class Course {
     id: string;
     @Column()
     name: string;
+    @OneToMany(() => Activity, (activity) => activity.course, { cascade: true })
+    activities: Activity[];
 }
