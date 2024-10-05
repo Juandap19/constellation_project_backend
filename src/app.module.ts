@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { ActivityModule } from './activity/activity.module';
 import { RubricModule } from './rubric/rubric.module';
 import { CriteriaModule } from './criteria/criteria.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { CriteriaModule } from './criteria/criteria.module';
     ActivityModule,
     RubricModule,
     CriteriaModule,
+    TeamsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
