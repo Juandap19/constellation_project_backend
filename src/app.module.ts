@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { CoursesModule } from './courses/courses.module';
 import { AuthModule } from './auth/auth.module';
 import { ActivityModule } from './activity/activity.module';
+import { RubricModule } from './rubric/rubric.module';
+import { CriteriaModule } from './criteria/criteria.module';
 
 @Module({
   imports: [
@@ -29,8 +31,9 @@ import { ActivityModule } from './activity/activity.module';
     CoursesModule,
     TeacherModule,
     AuthModule,
-
     ActivityModule,
+    RubricModule,
+    CriteriaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
