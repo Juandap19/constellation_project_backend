@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TeacherModule } from './users/teacher/teacher.module';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CoursesModule } from './courses/courses.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { CoursesModule } from './courses/courses.module';
       }
     }),
     CoursesModule,
+    TeacherModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
