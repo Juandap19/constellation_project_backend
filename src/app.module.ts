@@ -27,7 +27,6 @@ import { ActivityModule } from './activity/activity.module';
     }),
     CoursesModule,
     AuthModule,
-
     ActivityModule,
   ],
   controllers: [AppController],
