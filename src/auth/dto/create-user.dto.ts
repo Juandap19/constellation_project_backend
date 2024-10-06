@@ -1,6 +1,9 @@
-import { IsEmail, IsString, Matches, MinLength } from "class-validator";
+import { IsEmail, IsString, IsUUID, Matches, MinLength } from "class-validator";
 
 export  class  CreateUserDto {
+
+   
+
     @IsString()
     @IsEmail()
     readonly email: string;
@@ -14,6 +17,9 @@ export  class  CreateUserDto {
 
     @IsString()
     readonly last_name: string
+
+    @IsString()
+    readonly role: string;
 
     @IsString()
     readonly user_code: string;

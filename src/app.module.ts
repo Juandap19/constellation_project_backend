@@ -6,6 +6,9 @@ import { AppService } from './app.service';
 import { CoursesModule } from './courses/courses.module';
 import { AuthModule } from './auth/auth.module';
 import { ActivityModule } from './activity/activity.module';
+import { Schedule } from './schedule/entities/schedule.entity';
+import { ScheduleModule } from './schedule/schedule.module';
+import { SkillsModule } from './skills/skills.module';
 
 @Module({
   imports: [
@@ -20,14 +23,17 @@ import { ActivityModule } from './activity/activity.module';
       password: process.env.DB_PASSWORD,
       port: +process.env.DB_PORT,
       autoLoadEntities: true,
-      synchronize: false, // solo para desarrollo
+      synchronize: true, // solo para desarrollo
       ssl: {
         rejectUnauthorized: false, // Permite conexiones sin verificar el certificado, útil en desarrollo
       },
+      
     }),
     CoursesModule,
     AuthModule,
     ActivityModule,
+    ScheduleModule,
+    SkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,25 +9,22 @@ import { BadRequestException, InternalServerErrorException } from '@nestjs/commo
 import { v4 as uuid } from 'uuid';
 import { isUUID } from 'class-validator';
 import { NotFoundException } from '@nestjs/common';
-
+import { Skills } from 'src/skills/entities/skill.entity';
+import { SkillsService } from 'src/skills/skills.service';
+import { forwardRef } from '@nestjs/common';
+import { create } from 'domain';
 @Injectable()
 export class AuthService {
 
   constructor(
-    @InjectRepository(Users) private readonly userRepository: Repository<Users>
+    @InjectRepository(Users) private readonly userRepository: Repository<Users> , @Inject(forwardRef(() => SkillsService))private readonly skillsService: SkillsService
 ) {}
 
 async createUser(createUserDto: CreateUserDto) {
   try{
       const {password, ...userData} = createUserDto;
-
-      const user = this.userRepository.create({
-          id: uuid(),
-          password : bcrypt.hashSync(password, 10),
-          ...userData});
-      await  this.userRepository.save(user);
-
-      return user;
+      const user = Object.assign({id: uuid(),password : bcrypt.hashSync(password, 10),...userData});
+      return await  this.userRepository.save(user);
 
   }catch(e) {
     this.handleDBErrors(e);
@@ -39,20 +36,14 @@ async createUser(createUserDto: CreateUserDto) {
   }
 
   async findOne(id: string) {
-    let user: Users;
+    const user = await this.userRepository.findOne({where: { id }, relations: ['skills']});
 
-    if(isUUID(id)){
-      user = await this.userRepository.findOneBy({id: id})
-    }else{
-      user = await this.userRepository.findOneBy({user_code: id})
-    }
-
-    if(!user){
-      throw new NotFoundException(`User with the id ${id} not found`)
+    if (!user) {
+        throw new NotFoundException(`User with the id ${id} not found`);
     }
 
     return user;
-  }
+}
 
   async update(identifier: string, updateUserDto: UpdateUserDto) {
     let user = await this.userRepository.findOne({
@@ -91,7 +82,8 @@ async createUser(createUserDto: CreateUserDto) {
     if(error.code === '23505') {
         throw new BadRequestException('User already exists');
     }
-
+    console.log(error);
     throw new InternalServerErrorException('Error creating user');
+    
 }
 }
