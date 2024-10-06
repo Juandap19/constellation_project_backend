@@ -5,19 +5,20 @@ import { Activity } from './entities/activity.entity';
 import { CreateActivityDto } from './dto/create-activitty.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { v4 as uuid } from 'uuid';
+import { CoursesService } from 'src/courses/courses.service';
 
 @Injectable()
 export class ActivityService {
   constructor(
     @InjectRepository(Activity)
-    private readonly activityRepository: Repository<Activity>,
+    private readonly activityRepository: Repository<Activity>, private readonly courseService: CoursesService
   ) {}
 
   async findAll() {
     const activities = await this.activityRepository.find();
-    if(activities.length===0) {
-        throw new NotFoundException('No activities found');
-    }
+    // if(activities.length===0) {
+    //     throw new NotFoundException('No activities found');
+    // }
     return activities;
   }
 
@@ -30,7 +31,8 @@ export class ActivityService {
   }
 
   async create(createActivityDto: CreateActivityDto) {
-    const newActivity = Object.assign({ ...createActivityDto, id: uuid() });
+    const course = await this.courseService.findOne(createActivityDto.course);
+    const newActivity = Object.assign({ ...createActivityDto, course, id: uuid() });
     return await this.activityRepository.save(newActivity);
   }
 

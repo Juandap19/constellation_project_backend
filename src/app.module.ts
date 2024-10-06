@@ -6,6 +6,9 @@ import { AppService } from './app.service';
 import { CoursesModule } from './courses/courses.module';
 import { AuthModule } from './auth/auth.module';
 import { ActivityModule } from './activity/activity.module';
+import { RubricModule } from './rubric/rubric.module';
+import { CriteriaModule } from './criteria/criteria.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { ActivityModule } from './activity/activity.module';
     CoursesModule,
     AuthModule,
     ActivityModule,
+    RubricModule,
+    CriteriaModule,
+    TeamsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
