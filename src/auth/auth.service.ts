@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import {  UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +10,10 @@ import { BadRequestException, InternalServerErrorException } from '@nestjs/commo
 import { v4 as uuid } from 'uuid';
 import { isUUID } from 'class-validator';
 import { NotFoundException } from '@nestjs/common';
+import { Skills } from 'src/skills/entities/skill.entity';
+import { SkillsService } from 'src/skills/skills.service';
+import { forwardRef } from '@nestjs/common';
+import { create } from 'domain';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as XLSX from 'xlsx';
@@ -18,21 +23,14 @@ import * as XLSX from 'xlsx';
 export class AuthService {
 
   constructor(
-    @InjectRepository(Users) private readonly userRepository: Repository<Users>, private readonly jwtService: JwtService
+    @InjectRepository(Users) private readonly userRepository: Repository<Users> , @Inject(forwardRef(() => SkillsService))private readonly skillsService: SkillsService, private readonly jwtService: JwtService
 ) {}
 
 async createUser(createUserDto: CreateUserDto) {
   try{
       const {password, ...userData} = createUserDto;
-
-      const user = this.userRepository.create({
-          id: uuid(),
-          password : bcrypt.hashSync(password, 10),
-          ...userData});
-
-      await  this.userRepository.save(user);
-
-      return user;
+      const user = Object.assign({id: uuid(),password : bcrypt.hashSync(password, 10),...userData});
+      return await  this.userRepository.save(user);
 
   }catch(e) {
     this.handleDBErrors(e);
@@ -44,20 +42,14 @@ async createUser(createUserDto: CreateUserDto) {
   }
 
   async findOne(id: string) {
-    let user: Users;
+    const user = await this.userRepository.findOne({where: { id }, relations: ['skills']});
 
-    if(isUUID(id)){
-      user = await this.userRepository.findOneBy({id: id})
-    }else{
-      user = await this.userRepository.findOneBy({user_code: id})
-    }
-
-    if(!user){
-      throw new NotFoundException(`User with the id ${id} not found`)
+    if (!user) {
+        throw new NotFoundException(`User with the id ${id} not found`);
     }
 
     return user;
-  }
+}
 
   async update(identifier: string, updateUserDto: UpdateUserDto) {
     let user: Users;
@@ -71,7 +63,13 @@ async createUser(createUserDto: CreateUserDto) {
     if (!user) {
       throw new NotFoundException(`User not found with id or student_code: ${identifier}`);
     }
-  
+
+    if (updateUserDto.password) {
+      user.password = bcrypt.hashSync(updateUserDto.password, 10);
+    } else {
+        delete updateUserDto.password;
+    }
+    
     user.email = updateUserDto.email || user.email;
     user.name = updateUserDto.name || user.name;
     if (updateUserDto.password) {
@@ -80,8 +78,7 @@ async createUser(createUserDto: CreateUserDto) {
 
     user.last_name = updateUserDto.last_name || user.last_name;
     user.user_code = updateUserDto.user_code || user.user_code;
-
-
+    user.skills = updateUserDto.skills || user.skills;
   
     return this.userRepository.save(user);
   }
@@ -113,7 +110,7 @@ async createUser(createUserDto: CreateUserDto) {
     if(error.code === '23505') {
         throw new BadRequestException('User already exists');
     }
-
+    console.log(error);
     throw new InternalServerErrorException('Error creating user');
   }
 
