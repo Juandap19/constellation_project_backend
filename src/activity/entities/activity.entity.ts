@@ -19,4 +19,5 @@ export class Activity {
   @ManyToOne(() => Course, (course) => course.activities)
   @JoinColumn({ name: 'course_id' })
   course: Course;
+
 }

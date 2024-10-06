@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TeacherModule } from './users/teacher/teacher.module';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -24,13 +23,12 @@ import { TeamsModule } from './teams/teams.module';
       password: process.env.DB_PASSWORD,
       port: +process.env.DB_PORT,
       autoLoadEntities: true,
-      synchronize: false, // solo para desarrollo
+      synchronize: true, // solo para desarrollo
       ssl: {
         rejectUnauthorized: false, // Permite conexiones sin verificar el certificado, útil en desarrollo
       },
     }),
     CoursesModule,
-    TeacherModule,
     AuthModule,
     ActivityModule,
     RubricModule,
