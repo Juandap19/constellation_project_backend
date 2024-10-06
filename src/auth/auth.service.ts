@@ -11,6 +11,8 @@ import { isUUID } from 'class-validator';
 import { NotFoundException } from '@nestjs/common';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import * as XLSX from 'xlsx';
+
 
 @Injectable()
 export class AuthService {
@@ -27,6 +29,7 @@ async createUser(createUserDto: CreateUserDto) {
           id: uuid(),
           password : bcrypt.hashSync(password, 10),
           ...userData});
+
       await  this.userRepository.save(user);
 
       return user;
@@ -89,7 +92,7 @@ async createUser(createUserDto: CreateUserDto) {
   }
 
 
-  private  handleDBErrors(error: any) {
+  private handleDBErrors(error: any) {
     if(error.code === '23505') {
         throw new BadRequestException('User already exists');
     }
@@ -111,5 +114,42 @@ async createUser(createUserDto: CreateUserDto) {
         token: this.jwtService.sign({user_id: user.id})
     };
   }
+
+
+  readExcel(buffer: Buffer): any[] {
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+  
+    const jsonData = XLSX.utils.sheet_to_json(sheet);
+  
+    this.importsUsers(jsonData)
+    return jsonData;
+  }
+
+  async importsUsers(jsonData: any[]): Promise<void> {
+    for (const person of jsonData) {
+      const student_user = new CreateUserDto();
+
+      if (!person.email) {
+        console.error('Missing email for person:', person);
+        continue;
+      }
+
+      student_user.email = person.email;
+      student_user.name = person.name; 
+      student_user.last_name = person.last_name;
+      student_user.password = person.password || 'ICESI_2024-1'; 
+      student_user.user_code = person.student_code;
+      student_user.role = "student";
+
+      try {
+        await this.createUser(student_user);
+      } catch (error) {
+        console.error('Error creating user:', error);
+      }
+    }
+  }
+
 
 }

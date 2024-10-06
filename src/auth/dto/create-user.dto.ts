@@ -3,20 +3,23 @@ import { IsEmail, IsString, Matches, MinLength } from "class-validator";
 export  class  CreateUserDto {
     @IsString()
     @IsEmail()
-    readonly email: string;
+    email: string;
     
     @IsString()
     @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {message: 'Password too weak'})
-    readonly password: string;
+    password: string;
 
     @IsString()
-    readonly name: string;
+    name: string;
 
     @IsString()
-    readonly last_name: string
+    last_name: string
 
     @IsString()
-    readonly user_code: string;
+    user_code: string;
+
+    @IsString()
+    role: string;
 
 
 
