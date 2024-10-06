@@ -1,7 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors , UploadedFile, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer'; 
+
 
 @Controller('auth')
 export class AuthController {
@@ -31,4 +35,21 @@ export class AuthController {
   remove(@Param('id') id: string) {
     return this.authService.remove(id);
   }
+
+  @Post('login')
+  loginUser(@Body() loginUserDto: LoginUserDto) {
+      return this.authService.loginUser(loginUserDto);
+  }
+
+  
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', {storage: memoryStorage(), }))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    const data = this.authService.readExcel(file.buffer);
+    return { message: 'uploaded and processed', data };
+  }
+
 }

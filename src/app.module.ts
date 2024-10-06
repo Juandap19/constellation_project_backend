@@ -9,6 +9,9 @@ import { ActivityModule } from './activity/activity.module';
 import { Schedule } from './schedule/entities/schedule.entity';
 import { ScheduleModule } from './schedule/schedule.module';
 import { SkillsModule } from './skills/skills.module';
+import { RubricModule } from './rubric/rubric.module';
+import { CriteriaModule } from './criteria/criteria.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -23,7 +26,7 @@ import { SkillsModule } from './skills/skills.module';
       password: process.env.DB_PASSWORD,
       port: +process.env.DB_PORT,
       autoLoadEntities: true,
-      synchronize: false, // solo para desarrollo
+      synchronize: true, // solo para desarrollo
       ssl: {
         rejectUnauthorized: false, // Permite conexiones sin verificar el certificado, útil en desarrollo
       },
@@ -31,14 +34,16 @@ import { SkillsModule } from './skills/skills.module';
     }),
     CoursesModule,
     AuthModule,
-    ActivityModule, 
+
     ScheduleModule,
     SkillsModule,
+    ActivityModule,
+    RubricModule,
+    CriteriaModule,
+    TeamsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
 
-/* 
-   */
