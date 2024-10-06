@@ -9,6 +9,7 @@ import { ActivityModule } from './activity/activity.module';
 import { RubricModule } from './rubric/rubric.module';
 import { CriteriaModule } from './criteria/criteria.module';
 import { TeamsModule } from './teams/teams.module';
+import { HolaModule } from './hola/hola.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { TeamsModule } from './teams/teams.module';
     RubricModule,
     CriteriaModule,
     TeamsModule,
+    HolaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
