@@ -17,13 +17,14 @@ import { create } from 'domain';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as XLSX from 'xlsx';
+import { TeamsService } from 'src/teams/teams.service';
 
 
 @Injectable()
 export class AuthService {
 
   constructor(
-    @InjectRepository(Users) private readonly userRepository: Repository<Users>, @Inject(forwardRef(() => SkillsService)) private readonly skillsService: SkillsService, private readonly jwtService: JwtService
+    @InjectRepository(Users) private readonly userRepository: Repository<Users>, @Inject(forwardRef(() => SkillsService)) private readonly skillsService: SkillsService, private readonly jwtService: JwtService ,  @Inject(forwardRef(() => TeamsService))private readonly teamService: TeamsService
   ) { }
 
   async createUser(createUserDto: CreateUserDto) {
@@ -46,9 +47,9 @@ export class AuthService {
     let user: Users;
 
     if (isUUID(identifier)) {
-      user = await this.userRepository.findOne({ where: {id: identifier} , relations: ['skills'] })
+      user = await this.userRepository.findOne({ where: {id: identifier}, relations: ['skills', 'teams', 'courses'] })
     } else {
-      user = await this.userRepository.findOne({ where: {user_code: identifier} , relations: ['skills'] })
+      user = await this.userRepository.findOne({ where: {user_code: identifier} , relations: ['skills', 'teams', 'courses'] })
     }
 
     if (!user) {
@@ -86,6 +87,8 @@ export class AuthService {
     user.last_name = updateUserDto.last_name || user.last_name;
     user.user_code = updateUserDto.user_code || user.user_code;
     user.skills = updateUserDto.skills || user.skills;
+    user.teams = updateUserDto.teams || user.teams;
+    user.courses = updateUserDto.courses || user.courses;
 
     return this.userRepository.save(user);
   }

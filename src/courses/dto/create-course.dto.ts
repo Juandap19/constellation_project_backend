@@ -6,4 +6,7 @@ export class CreateCourseDto {
     
     @IsString()
     name: string;
+
+    @IsUUID()
+    readonly users: string;
 }

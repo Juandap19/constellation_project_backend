@@ -1,6 +1,8 @@
 import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { Skills } from 'src/skills/entities/skill.entity';
+import { Team } from 'src/teams/entities/teams.entity';
+import { Course } from 'src/courses/entities/course.entity';
 
 @Entity()
 export class Users {
@@ -32,4 +34,17 @@ export class Users {
     @ManyToMany(() => Skills, skill => skill.users, { cascade: true })
     @JoinTable()
     skills: Skills[];
+
+    @ManyToMany(()=> Team , (team) => team.users, {cascade: true})
+    @JoinTable()
+    teams: Team[];
+
+    @ManyToMany(() => Course, (course) => course.users, {cascade: true})
+    @JoinTable()
+    courses: Course[];
+
+
+
+
+
 }

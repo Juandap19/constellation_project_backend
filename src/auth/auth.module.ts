@@ -9,6 +9,10 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { Skills } from 'src/skills/entities/skill.entity';
 import { SkillsModule } from 'src/skills/skills.module';
+import { Team } from 'src/teams/entities/teams.entity';
+import { TeamsModule } from 'src/teams/teams.module';
+import { Course } from 'src/courses/entities/course.entity';
+import { CoursesModule } from 'src/courses/courses.module';
 
 @Module({
   controllers: [AuthController],
@@ -18,6 +22,8 @@ import { SkillsModule } from 'src/skills/skills.module';
     TypeOrmModule.forFeature([Users]),
     ConfigModule,
     forwardRef(() => SkillsModule),
+    forwardRef(() => TeamsModule),
+    forwardRef(() => CoursesModule),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
