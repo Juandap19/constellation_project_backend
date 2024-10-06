@@ -31,7 +31,7 @@ import { SkillsModule } from './skills/skills.module';
     }),
     CoursesModule,
     AuthModule,
-    ActivityModule,
+    ActivityModule, 
     ScheduleModule,
     SkillsModule,
   ],
@@ -39,3 +39,6 @@ import { SkillsModule } from './skills/skills.module';
   providers: [AppService],
 })
 export class AppModule {}
+
+/* 
+   */
