@@ -28,6 +28,6 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
     @IsArray()
     @IsUUID("all", { each: true, message: 'Each skill must be a valid UUID' })
-    readonly skills: Skills[];
+    skills: Skills[];
 
 }

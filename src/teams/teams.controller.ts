@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { CreateTeamsDto } from './dto/create-teams.dto';
 
@@ -21,7 +21,7 @@ export class TeamsController {
         return this.teamsService.create(createTeamsDto);
     }
 
-    @Put(':id')
+    @Patch(':id')
     async update (
         @Param('id') id: string,
         @Body() updateTeamsDto: CreateTeamsDto

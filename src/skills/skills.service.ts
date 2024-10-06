@@ -18,12 +18,13 @@ export class SkillsService {
   async addSkillToUser(skillId: string, userId: string) {
     const skill = await this.skillRepository.findOne({ where: { id: skillId } });
     const user = await this.authService.findOne(userId);
-
+    
     if (!skill || !user) {
         throw new NotFoundException('Skill or user not found');
     }
-
+    console.log("ESTE ES EL USER SKILL ",user.skills);
     user.skills = [...user.skills, skill];
+    
     return await this.authService.update(user.id, user);
   }
 
