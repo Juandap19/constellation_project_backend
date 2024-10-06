@@ -20,7 +20,7 @@ export class CoursesService {
   }
 
   findAll() {
-    return this.courseRepository.find();
+    return this.courseRepository.find({relations:['activities']});
   }
 
   async findOne(id: string) {

@@ -6,6 +6,7 @@ import {
   Body,
   Put,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { Activity } from './entities/activity.entity';
@@ -31,7 +32,7 @@ export class ActivityController {
     return this.activityService.create(createActivityDto);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateActivityDto: UpdateActivityDto,

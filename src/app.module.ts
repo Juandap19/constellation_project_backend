@@ -30,7 +30,7 @@ import { TeamsModule } from './teams/teams.module';
       ssl: {
         rejectUnauthorized: false, // Permite conexiones sin verificar el certificado, útil en desarrollo
       },
-      logging: true,
+      logging: false,
     }),
     CoursesModule,
     AuthModule,
