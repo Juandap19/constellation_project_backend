@@ -23,11 +23,11 @@ import { SkillsModule } from './skills/skills.module';
       password: process.env.DB_PASSWORD,
       port: +process.env.DB_PORT,
       autoLoadEntities: true,
-      synchronize: true, // solo para desarrollo
+      synchronize: false, // solo para desarrollo
       ssl: {
         rejectUnauthorized: false, // Permite conexiones sin verificar el certificado, útil en desarrollo
       },
-      
+      logging: true,
     }),
     CoursesModule,
     AuthModule,

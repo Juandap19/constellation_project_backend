@@ -53,14 +53,18 @@ async createUser(createUserDto: CreateUserDto) {
     if (!user) {
       throw new NotFoundException(`User not found with id or student_code: ${identifier}`);
     }
-  
+
+    if (updateUserDto.password) {
+      user.password = bcrypt.hashSync(updateUserDto.password, 10);
+    } else {
+        delete updateUserDto.password;
+    }
+    
     user.email = updateUserDto.email || user.email;
     user.name = updateUserDto.name || user.name;
-    user.password =  bcrypt.hashSync(updateUserDto.password, 10)|| user.password;
     user.last_name = updateUserDto.last_name || user.last_name;
     user.user_code = updateUserDto.user_code || user.user_code;
-
-
+    user.skills = updateUserDto.skills || user.skills;
   
     return this.userRepository.save(user);
   }

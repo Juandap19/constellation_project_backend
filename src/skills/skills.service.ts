@@ -15,6 +15,17 @@ export class SkillsService {
 
   constructor(@InjectRepository(Skills) private readonly skillRepository: Repository<Skills> , @Inject(forwardRef(() => AuthService))private readonly authService: AuthService ) {}
 
+  async addSkillToUser(skillId: string, userId: string) {
+    const skill = await this.skillRepository.findOne({ where: { id: skillId } });
+    const user = await this.authService.findOne(userId);
+
+    if (!skill || !user) {
+        throw new NotFoundException('Skill or user not found');
+    }
+
+    user.skills = [...user.skills, skill];
+    return await this.authService.update(user.id, user);
+  }
 
  
   async create(skill: CreateSkillDto) {

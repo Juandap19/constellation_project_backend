@@ -31,4 +31,9 @@ export class SkillsController {
   remove(@Param('id') id: string) {
     return this.skillsService.remove(id);
   }
+
+  @Post(':skillId/user/:userId')
+  addSkillToUser(@Param('skillId') skillId: string, @Param('userId') userId: string) {
+    return this.skillsService.addSkillToUser(skillId, userId);
+  }
 }
