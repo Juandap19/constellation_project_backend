@@ -60,9 +60,13 @@ async createUser(createUserDto: CreateUserDto) {
   }
 
   async update(identifier: string, updateUserDto: UpdateUserDto) {
-    let user = await this.userRepository.findOne({
-      where: [{ id: identifier }, { user_code: identifier }],
-    });
+    let user: Users;
+
+    if(isUUID(identifier)){
+      user = await this.userRepository.findOneBy({id: identifier})
+    }else{
+      user = await this.userRepository.findOneBy({user_code: identifier})
+    }
   
     if (!user) {
       throw new NotFoundException(`User not found with id or student_code: ${identifier}`);
@@ -70,7 +74,10 @@ async createUser(createUserDto: CreateUserDto) {
   
     user.email = updateUserDto.email || user.email;
     user.name = updateUserDto.name || user.name;
-    user.password =  bcrypt.hashSync(updateUserDto.password, 10)|| user.password;
+    if (updateUserDto.password) {
+      user.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
     user.last_name = updateUserDto.last_name || user.last_name;
     user.user_code = updateUserDto.user_code || user.user_code;
 
@@ -80,9 +87,19 @@ async createUser(createUserDto: CreateUserDto) {
   }
 
   async remove(identifier: string) {
-    let user = await this.userRepository.findOne({
-      where: [{ id: identifier }, { user_code: identifier }],
-    });
+
+    let user: Users;
+
+    if(isUUID(identifier)){
+      user = await this.userRepository.findOneBy({id: identifier})
+    }else{
+      user = await this.userRepository.findOneBy({user_code: identifier})
+    }
+  
+    if (!user) {
+      throw new NotFoundException(`User not found with id or student_code: ${identifier}`);
+    }
+
   
     if (!user) {
       throw new NotFoundException(`User not found with id or student_code: ${identifier}`);
