@@ -6,6 +6,9 @@ import { AppService } from './app.service';
 import { CoursesModule } from './courses/courses.module';
 import { AuthModule } from './auth/auth.module';
 import { ActivityModule } from './activity/activity.module';
+import { Schedule } from './schedule/entities/schedule.entity';
+import { ScheduleModule } from './schedule/schedule.module';
+import { SkillsModule } from './skills/skills.module';
 import { RubricModule } from './rubric/rubric.module';
 import { CriteriaModule } from './criteria/criteria.module';
 import { TeamsModule } from './teams/teams.module';
@@ -27,9 +30,13 @@ import { TeamsModule } from './teams/teams.module';
       ssl: {
         rejectUnauthorized: false, // Permite conexiones sin verificar el certificado, útil en desarrollo
       },
+      logging: true,
     }),
     CoursesModule,
     AuthModule,
+
+    ScheduleModule,
+    SkillsModule,
     ActivityModule,
     RubricModule,
     CriteriaModule,
@@ -39,3 +46,4 @@ import { TeamsModule } from './teams/teams.module';
   providers: [AppService],
 })
 export class AppModule {}
+
