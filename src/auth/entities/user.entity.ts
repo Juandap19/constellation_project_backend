@@ -43,8 +43,4 @@ export class Users {
     @JoinTable()
     courses: Course[];
 
-
-
-
-
 }
