@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { CreateTeamsDto } from './dto/create-teams.dto';
+import { UpdateTeamsDto } from './dto/update-teams.dto';
 
 @Controller('team')
 export class TeamsController {
@@ -24,7 +25,7 @@ export class TeamsController {
     @Patch(':id')
     async update (
         @Param('id') id: string,
-        @Body() updateTeamsDto: CreateTeamsDto
+        @Body() updateTeamsDto: UpdateTeamsDto
     ) {
         return this.teamsService.update(id, updateTeamsDto);
     }
@@ -33,4 +34,10 @@ export class TeamsController {
     async remove(@Param('id') id: string) {
         return this.teamsService.remove(id);
     }
+    
+
+    @Post(':teamId/user/:userId')
+  addTeamToUser(@Param('teamId') teamId: string, @Param('userId') userId: string) {
+    return this.teamsService.addTeamToUser(teamId, userId);
+  }
 }

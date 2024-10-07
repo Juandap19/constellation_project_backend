@@ -7,16 +7,16 @@ export class Schedule {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
-    @Column("text" ,{unique: true})
+    @Column("text")
     day: string
 
-    @Column("time", {unique: true})
+    @Column("time",)
     hour_i: string;
 
-    @Column("time", {unique: true})
+    @Column("time",)
     hour_f: string;
   
-    @Column( {unique: true})
+    @Column()
     state: boolean;
 
     @ManyToOne(() => Users, (user) => user.schedules)
