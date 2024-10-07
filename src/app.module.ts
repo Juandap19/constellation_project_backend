@@ -12,6 +12,8 @@ import { SkillsModule } from './skills/skills.module';
 import { RubricModule } from './rubric/rubric.module';
 import { CriteriaModule } from './criteria/criteria.module';
 import { TeamsModule } from './teams/teams.module';
+import { CriteriaGradeModule } from './criteria_grade/criteria_grade.module';
+import { RubricGradeModule } from './rubric_grade/rubric_grade.module';
 
 @Module({
   imports: [
@@ -34,13 +36,14 @@ import { TeamsModule } from './teams/teams.module';
     }),
     CoursesModule,
     AuthModule,
-
     ScheduleModule,
     SkillsModule,
     ActivityModule,
     RubricModule,
     CriteriaModule,
     TeamsModule,
+    CriteriaGradeModule,
+    RubricGradeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

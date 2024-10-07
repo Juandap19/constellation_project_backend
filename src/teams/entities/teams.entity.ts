@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Users } from "src/auth/entities/user.entity";
+import { Course } from "src/courses/entities/course.entity";
 
 @Entity()
 export class Team {
@@ -7,4 +9,11 @@ export class Team {
 
     @Column()
     name: string;
+
+    @ManyToMany(() => Users , (user) => user.teams)
+    users: Users[];
+
+    @ManyToOne(() => Course, (course) => course.teams)
+    course: Course;
+
 }

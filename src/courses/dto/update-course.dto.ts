@@ -10,4 +10,7 @@ export class UpdateCourseDto extends PartialType(CreateCourseDto) {
     @IsString()
     @IsOptional()
     name: string;
+
+    @IsUUID()
+    readonly users: string;
 }
