@@ -31,7 +31,7 @@ export class CoursesService {
     if (!course || !user) {
         throw new NotFoundException('course or user not found');
     }
-    console.log("ESTE ES EL USER COURSE ",user.courses);
+
     user.courses = [...user.courses, course];
     
     return await this.authService.update(user.id, user);

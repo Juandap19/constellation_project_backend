@@ -12,6 +12,4 @@ export class Team {
     @ManyToMany(() => Users , (user) => user.teams)
     users: Users[];
 
-
-
 }
