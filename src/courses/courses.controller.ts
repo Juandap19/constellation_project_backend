@@ -40,6 +40,7 @@ export class CoursesController {
   @Post('teams/:courseId')
   createGroups(@Param('courseId') courseId: string) {
     return this.coursesService.createGroups(courseId);
+     
   }
 
 }

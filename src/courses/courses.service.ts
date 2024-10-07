@@ -9,13 +9,18 @@ import { Inject } from '@nestjs/common';
 import { forwardRef } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { Users } from 'src/auth/entities/user.entity';
+import { Team } from 'src/teams/entities/teams.entity';
+import { TeamsService } from 'src/teams/teams.service';
+
 
 @Injectable()
 export class CoursesService {
 
   constructor(
     @InjectRepository(Course) private readonly courseRepository: Repository<Course>, @Inject(forwardRef(() => AuthService))private readonly authService: AuthService,
-    @InjectRepository(Users) private readonly usersRepository: Repository<Users>
+    @InjectRepository(Users) private readonly usersRepository: Repository<Users>,
+    @InjectRepository(Team) private readonly teamsRepositoy: Repository<Team>,
+    private readonly teamService: TeamsService
   ) {}
 
 
@@ -33,7 +38,6 @@ export class CoursesService {
     if (!course || !user) {
         throw new NotFoundException('course or user not found');
     }
-    console.log("ESTE ES EL USER COURSE ",user.courses);
     user.courses = [...user.courses, course];
     
     return await this.authService.update(user.id, user);
@@ -74,102 +78,250 @@ export class CoursesService {
     return deleteCourse;
   }
 
-  async createGroups(courseId: string) {    
-    const course = await this.findOne(courseId);
   
+  async createGroups(courseId: string) {
+    // Generar los grupos automáticamente
+    const thegroups = await this.generateAutomaticGroups(courseId);
+    
+    // Crear un nuevo array donde cada grupo tendrá un nombre asignado
+    const groupsWithNames = thegroups.map((group, index) => {
+      return { 
+        name: `auto${index + 1}`,  // Asignar un nombre único
+        array: group               // Mantener el grupo original
+      };
+    });
+  
+    // Imprimir cada grupo con su nombre
+    groupsWithNames.forEach(group => {
+    });
+  
+  
+    // Crear los equipos en la base de datos
+    for (const element of groupsWithNames) {
+      const newTeam = Object.assign({
+        id: uuid(),
+        name: element.name,       // Nombre del equipo
+        course: courseId        // ID del curso
+      });
+  
+      await this.teamsRepositoy.save(newTeam);  // Guardar el equipo en la base de datos
+
+      element.array.forEach(element2 => {
+        this.teamService.addTeamToUser(newTeam.id, element2.id)
+      });
+    }
+
+  
+  
+    return groupsWithNames;
+  }
+  
+  
+
+  async generateAutomaticGroups(courseId: string): Promise<Users[][]> {
+    
+    const course = await this.findOne(courseId);
+
     if (!course) {
       throw new NotFoundException(`Course with id ${courseId} not found`);
     }
 
-    const usersInCourse = await this.usersRepository.find({
+    // Buscar todos los usuarios en el curso con rol 'student' y sus relaciones
+    const usersInCourse: Users[] = await this.usersRepository.find({
       where: {
         courses: {
-          id: courseId
-        }
+          id: courseId,
+        },
+        role: 'student', // Filtrar solo a los estudiantes
       },
-      relations: ['courses', 'skills', 'schedules']  
+      relations: ['courses', 'skills', 'schedules'],
     });
 
     if (!usersInCourse || usersInCourse.length === 0) {
       throw new NotFoundException(`No users found for course with id ${courseId}`);
     }
 
-    // Crear un mapa para agrupar estudiantes por horarios coincidentes
-    const groupedBySchedule = new Map();
+    // Eliminar duplicados de usuarios (si existe)
+    const uniqueUsersMap = new Map<string, Users>();
+    usersInCourse.forEach((user) => {
+      if (!uniqueUsersMap.has(user.id)) {
+        uniqueUsersMap.set(user.id, user);
+      }
+    });
+    const uniqueUsers = Array.from(uniqueUsersMap.values());
 
-    // Mantener un conjunto de estudiantes ya asignados a equipos
-    const assignedStudents = new Set();
+    // Crear un mapa para agrupar estudiantes por horarios coincidentes
+    const groupedBySchedule: Map<string, Users[]> = new Map<string, Users[]>();
 
     // Agrupar estudiantes por day, hour_i y hour_f
-    usersInCourse.forEach(user => {
-      user.schedules.forEach(schedule => {
-        const key = `${schedule.day}-${schedule.hour_i}-${schedule.hour_f}`;
-        
+    uniqueUsers.forEach((user) => {
+      // Crear un Set de claves de horarios para eliminar duplicados por estudiante
+      const scheduleKeys = new Set(
+        user.schedules.map((schedule) => `${schedule.day}-${schedule.hour_i}-${schedule.hour_f}`)
+      );
+
+      scheduleKeys.forEach((key) => {
         if (!groupedBySchedule.has(key)) {
           groupedBySchedule.set(key, []);
         }
-
-        groupedBySchedule.get(key).push(user);
+        groupedBySchedule.get(key)!.push(user); // Usar el operador de aserción no nula
       });
     });
 
-    const teams = [];
+    const teams: Users[][] = [];
+    const assignedStudents: Set<string> = new Set<string>();
 
-    // Ahora que tenemos los estudiantes agrupados por horarios coincidentes, formamos los equipos
-    groupedBySchedule.forEach((students, scheduleKey) => {
-      let team = [];
-      const usedSkills = new Set();
+    
+    const createTeamsFromGroup = (students: Users[]) => {
+      // Eliminar duplicados dentro del mismo grupo de horarios
+      const uniqueStudents = Array.from(
+        new Map(students.map((student) => [student.id, student])).values()
+      );
 
-      students.forEach(student => {
-        // Verificar si el estudiante ya fue asignado a un equipo
-        if (assignedStudents.has(student.id)) {
-          return; // Saltar este estudiante ya que ya está en un equipo
-        }
+      // Filtrar estudiantes que aún no han sido asignados
+      const unassigned = uniqueStudents.filter((student) => !assignedStudents.has(student.id));
+      const totalUnassigned = unassigned.length;
 
-        const studentSkills = student.skills.map(skill => skill.name);
+      if (totalUnassigned === 0) return;
 
-        // Verificamos que el estudiante tenga habilidades diferentes dentro del equipo
-        const hasUniqueSkills = studentSkills.every(skill => !usedSkills.has(skill));
+      // Caso especial: Si hay exactamente 3 estudiantes, agruparlos juntos
+      if (totalUnassigned === 3) {
+        teams.push(unassigned);
+        unassigned.forEach((student) => assignedStudents.add(student.id));
+        return;
+      }
 
-        if (hasUniqueSkills) {
-          team.push(student);
-          studentSkills.forEach(skill => usedSkills.add(skill)); // Añadimos las habilidades al conjunto
+      // Crear un mapa para agrupar estudiantes por habilidades
+      const skillMap: Map<string, Users[]> = new Map<string, Users[]>();
 
-          // Marcar al estudiante como asignado a un equipo
-          assignedStudents.add(student.id);
+      unassigned.forEach((student) => {
+        student.skills.forEach((skill) => {
+          if (!skillMap.has(skill.name)) {
+            skillMap.set(skill.name, []);
+          }
+          skillMap.get(skill.name)!.push(student);
+        });
+      });
 
-          // Limitar el tamaño del equipo a 3 estudiantes
-          if (team.length === 3) {
-            return; // Salir del bucle si el equipo ya tiene 3 estudiantes
+      // Mientras haya al menos dos habilidades diferentes disponibles
+      while (skillMap.size >= 2) {
+        const team: Users[] = [];
+        const usedSkills: Set<string> = new Set<string>();
+
+        // Seleccionar un estudiante de cada habilidad
+        for (let [skill, studentsWithSkill] of skillMap) {
+          if (usedSkills.size >= 2) break;
+          const student = studentsWithSkill.shift();
+          if (student) {
+            team.push(student);
+            usedSkills.add(skill);
+            assignedStudents.add(student.id);
+            // Si ya no hay más estudiantes con esta habilidad, eliminar del mapa
+            if (studentsWithSkill.length === 0) {
+              skillMap.delete(skill);
+            }
           }
         }
-      });
 
-      // Verificar si el equipo es válido (mínimo 1 estudiante, máximo 3)
-      if (team.length >= 1 && team.length <= 3) {
-        teams.push(team); // Añadimos el equipo
+        if (team.length >= 2) {
+          teams.push(team);
+        }
+      }
+
+      // Manejar estudiantes restantes
+      const remaining = unassigned.filter((student) => !assignedStudents.has(student.id));
+      if (remaining.length >= 2) {
+        // Agruparlos aunque las habilidades se repitan
+        for (let i = 0; i < remaining.length; i += 2) {
+          const group = remaining.slice(i, i + 2);
+          group.forEach((student) => assignedStudents.add(student.id));
+          teams.push(group);
+        }
+      } else if (remaining.length === 1) {
+        teams.push([remaining[0]]);
+        assignedStudents.add(remaining[0].id);
+      }
+    };
+
+    // Crear equipos para cada grupo de horario
+    groupedBySchedule.forEach((students, scheduleKey) => {
+      createTeamsFromGroup(students);
+    });
+
+    // Verificar si algunos estudiantes no fueron asignados (aunque debería estar cubierto)
+    const unassignedStudents = uniqueUsers.filter((student) => !assignedStudents.has(student.id));
+
+    // Intentar asignar estudiantes no asignados a equipos existentes, si coinciden en horario
+    unassignedStudents.forEach((unassigned) => {
+      let added = false;
+      for (const team of teams) {
+        // Permitir hasta 3 miembros por equipo
+        if (team.length < 3 && this.hasMatchingSchedule(team, unassigned)) {
+          team.push(unassigned);
+          assignedStudents.add(unassigned.id);
+          added = true;
+          break; // Salir del ciclo una vez asignado
+        }
+      }
+
+      // Si no pudo ser asignado a un equipo existente, formar un nuevo equipo
+      if (!added) {
+        teams.push([unassigned]);
+        assignedStudents.add(unassigned.id);
       }
     });
 
-    // Verificar si algunos estudiantes no fueron asignados
-    const unassignedStudents = [];
-
-    usersInCourse.forEach(student => {
-      if (!assignedStudents.has(student.id)) {
-        // Agregar a la lista de no asignados
-        unassignedStudents.push(student);
+    // Asegurarse de que no haya equipos con un solo miembro a menos que sea absolutamente necesario
+    const singletonTeams = teams.filter((team) => team.length === 1);
+    singletonTeams.forEach((singletonTeam) => {
+      const student = singletonTeam[0];
+      for (const otherTeam of teams) {
+        if (
+          otherTeam.length < 3 &&
+          this.hasMatchingSchedule(otherTeam, student) &&
+          otherTeam[0].id !== student.id
+        ) {
+          otherTeam.push(student);
+          assignedStudents.add(student.id);
+          // Eliminar el equipo que ahora está vacío
+          const index = teams.indexOf(singletonTeam);
+          if (index > -1) {
+            teams.splice(index, 1);
+          }
+          break;
+        }
       }
     });
 
-    // Agrupar los no asignados en equipos de hasta 3 estudiantes
-    while (unassignedStudents.length > 0) {
-      const team = unassignedStudents.splice(0, 3); // Tomar hasta 3 estudiantes
-      teams.push(team);
-    }
+    // Verificar nuevamente si hay algún estudiante sin asignar
+    const finalUnassignedStudents = uniqueUsers.filter(
+      (student) => !assignedStudents.has(student.id)
+    );
 
-    console.log('Teams:', teams);
+    // Asignar cualquier estudiante restante a un nuevo grupo (si aplica)
+    finalUnassignedStudents.forEach((unassigned) => {
+      teams.push([unassigned]);
+      assignedStudents.add(unassigned.id);
+    });
 
     return teams;
   }
+
+
+  hasMatchingSchedule(team: Users[], student: Users): boolean {
+    return team.every((member) =>
+      member.schedules.some((schedule1) =>
+        student.schedules.some(
+          (schedule2) =>
+            schedule1.day === schedule2.day &&
+            schedule1.hour_i === schedule2.hour_i &&
+            schedule1.hour_f === schedule2.hour_f
+        )
+      )
+    );
+  }
+
+
+
 
 }

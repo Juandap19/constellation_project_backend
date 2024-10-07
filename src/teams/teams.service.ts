@@ -37,7 +37,6 @@ export class TeamsService {
         if (!team || !user) {
             throw new NotFoundException('Team or user not found');
         }
-        console.log("ESTE ES EL USER SKILL ",user.teams);
         user.teams = [...user.teams, team];
         
         return await this.authService.update(user.id, user);
