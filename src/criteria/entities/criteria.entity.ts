@@ -16,7 +16,7 @@ export class Criteria {
     @Column('int')
     percentage: number;
 
-    @ManyToOne(() => Rubric, (rubric) => rubric.criterias)
+    @ManyToOne(() => Rubric, (rubric) => rubric.criterias, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'rubric_id' })
     rubric: Rubric; 
 }

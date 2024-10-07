@@ -7,6 +7,7 @@ import { Users } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { NotFoundException, UnauthorizedException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as XLSX from 'xlsx';
 
 describe('AuthService', () => {
     let service: AuthService;
@@ -84,6 +85,22 @@ describe('AuthService', () => {
         });
     });
 
+    describe('findAll', () => {
+        it('should return all users', async () => {
+            const users = [
+                { id: '1', email: 'test1@example.com', name: 'User1' },
+                { id: '2', email: 'test2@example.com', name: 'User2' },
+            ];
+
+            mockUserRepository.find.mockResolvedValue(users);
+
+            const result = await service.findAll();
+            expect(result).toEqual(users);
+            expect(mockUserRepository.find).toHaveBeenCalled();
+        });
+    });
+
+
     describe('findOne', () => {
         it('should return a user by id', async () => {
             const user = { id: '1', email: 'test@example.com', user_code: '1234' };
@@ -142,6 +159,13 @@ describe('AuthService', () => {
 
             await expect(service.update('1', { email: 'updated@example.com' })).rejects.toThrow(NotFoundException);
         });
+
+        it('should throw an error if database fails', async () => {
+            mockUserRepository.findOneBy.mockResolvedValue({ id: '1', email: 'old@example.com' });
+            mockUserRepository.save.mockRejectedValue(new InternalServerErrorException());
+
+            await expect(service.update('1', { email: 'updated@example.com' })).rejects.toThrow(InternalServerErrorException);
+        });
     });
 
     describe('remove', () => {
@@ -163,4 +187,56 @@ describe('AuthService', () => {
             await expect(service.remove('1')).rejects.toThrow(NotFoundException);
         });
     });
+
+    describe('readExcel', () => {
+        it('should parse Excel buffer and import users', async () => {
+            const mockBuffer = Buffer.from('');
+            const mockJsonData = [
+                { email: 'student1@example.com', name: 'Student1', last_name: 'Last1', student_code: '1234' },
+            ];
+
+            jest.spyOn(XLSX, 'read').mockReturnValue({
+                SheetNames: ['Sheet1'],
+                Sheets: { Sheet1: {} },
+            });
+            jest.spyOn(XLSX.utils, 'sheet_to_json').mockReturnValue(mockJsonData);
+            jest.spyOn(service, 'importsUsers').mockResolvedValue();
+            
+            const result = service.readExcel(mockBuffer);
+            expect(result).toEqual(mockJsonData);
+            expect(service.importsUsers).toHaveBeenCalledWith(mockJsonData);
+        });
+    });
+
+    describe('importsUsers', () => {
+        it('should create users from JSON data', async () => {
+            const jsonData = [
+                { email: 'student1@example.com', name: 'Student1', last_name: 'Last1', student_code: '1234' },
+            ];
+
+            const mockUser: Users = {
+                id: 'some-uuid',
+                email: 'test@example.com',
+                password: 'hashedPassword',
+                name: 'John',
+                last_name: 'Doe',
+                user_code: '1234',
+                role: 'student',
+              };
+              
+              jest.spyOn(service, 'createUser').mockResolvedValue(mockUser);
+              
+
+            await service.importsUsers(jsonData);
+            expect(service.createUser).toHaveBeenCalledWith(expect.objectContaining({
+                email: 'student1@example.com',
+                name: 'Student1',
+                last_name: 'Last1',
+                user_code: '1234',
+                password: expect.any(String),
+            }));
+        });
+    });
+
+
 });
