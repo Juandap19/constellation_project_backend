@@ -17,7 +17,7 @@ import { CoursesModule } from 'src/courses/courses.module';
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  exports: [AuthService, PassportModule, JwtModule],
   imports: [
     TypeOrmModule.forFeature([Users]),
     ConfigModule,

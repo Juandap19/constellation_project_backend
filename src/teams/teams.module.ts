@@ -6,9 +6,10 @@ import { Team } from './entities/teams.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { forwardRef } from '@nestjs/common';
 import { Users } from 'src/auth/entities/user.entity';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Team,Users]),
+  imports: [TypeOrmModule.forFeature([Team,Users, PassportModule]),
   forwardRef(() => AuthModule)
 ],
  exports: [TeamsService],
