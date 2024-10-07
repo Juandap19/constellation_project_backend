@@ -37,4 +37,10 @@ export class CoursesController {
     return this.coursesService.addCourseToUser(courseId, userId);
   }
 
+  @Post('teams/:courseId')
+  createGroups(@Param('courseId') courseId: string) {
+    return this.coursesService.createGroups(courseId);
+     
+  }
+
 }
