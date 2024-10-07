@@ -1,4 +1,4 @@
-import { Activity } from "src/activity/entities/activity.entity";
+import { Activity } from "../../activity/entities/activity.entity";
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 
 @Entity()

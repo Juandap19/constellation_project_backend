@@ -1,4 +1,4 @@
-import { Rubric } from "src/rubric/entities/rubric.entity";
+import { Rubric } from "../../rubric/entities/rubric.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
