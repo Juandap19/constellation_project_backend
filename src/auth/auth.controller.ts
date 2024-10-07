@@ -5,6 +5,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer'; 
+import { ValidRoles } from './interfaces/valid-roles';
+import { Auth } from './decorators/auth.decorator';
 
 
 @Controller('auth')
@@ -42,13 +44,15 @@ export class AuthController {
   }
 
   
-  @Post('upload')
+  // teacher 
+  @Post('uploadStudents/:id')
+  @Auth(ValidRoles.teacher)
   @UseInterceptors(FileInterceptor('file', {storage: memoryStorage(), }))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  uploadFile(@Param('id') id: string ,@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    const data = this.authService.readExcel(file.buffer);
+    const data = this.authService.readExcel(file.buffer, id);
     return { message: 'uploaded and processed', data };
   }
 

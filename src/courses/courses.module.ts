@@ -8,12 +8,13 @@ import { AuthModule } from 'src/auth/auth.module';
 import { Users } from 'src/auth/entities/user.entity';
 import { Team } from 'src/teams/entities/teams.entity';
 import { TeamsModule } from 'src/teams/teams.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   controllers: [CoursesController],
   providers: [CoursesService],
-  imports: [TypeOrmModule.forFeature([Course,Users, Team]), forwardRef(() => AuthModule),
-  TeamsModule
+  imports: [TypeOrmModule.forFeature([Course,Users, Team]), forwardRef(() => AuthModule), 
+  TeamsModule, PassportModule
 ],
   exports: [CoursesService],
 })
