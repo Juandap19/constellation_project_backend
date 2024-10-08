@@ -7,12 +7,12 @@ export class UpdateSkillDto extends PartialType(CreateSkillDto) {
 
 
     @IsUUID()
-    readonly users: string;
+    readonly users?: string;
 
     @IsString()
-    readonly name: string
+    readonly name?: string
 
     @IsString()
-    readonly description: string
+    readonly description?: string
 
 }

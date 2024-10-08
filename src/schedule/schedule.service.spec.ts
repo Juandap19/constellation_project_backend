@@ -98,7 +98,7 @@ describe('ScheduleService', () => {
             const scheduleID = { id: newSchedule.id };
             mockScheduleRepository.findOneBy.mockResolvedValue(scheduleID);
 
-            const result = await service.findOne(newSchedule.id );
+            const result = await service.findOne(newSchedule.id);
             expect(scheduleRepository.findOneBy).toHaveBeenCalledWith({ id: newSchedule.id  });
             expect(result).toEqual(scheduleID);
         });
