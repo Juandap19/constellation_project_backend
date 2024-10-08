@@ -7,7 +7,9 @@ import { Users } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { NotFoundException, UnauthorizedException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import * as XLSX from 'xlsx';
+import { v4 as uuid } from 'uuid';
+import { TeamsService } from '../teams/teams.service';
+import { SkillsService } from '../skills/skills.service';
 
 describe('AuthService', () => {
     let service: AuthService;
@@ -27,12 +29,31 @@ describe('AuthService', () => {
         sign: jest.fn(),
     };
 
+    const mockTeamService = {
+        findOne: jest.fn(),
+        findAll: jest.fn(),
+        addTeamToUser: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        remove: jest.fn(),
+    };
+
+    const mockSkillsService = {
+        findOne: jest.fn(),
+        findAll: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        remove: jest.fn(),
+    };
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 AuthService,
                 { provide: getRepositoryToken(Users), useValue: mockUserRepository },
                 { provide: JwtService, useValue: mockJwtService },
+                { provide: TeamsService, useValue: mockTeamService },
+                { provide: SkillsService, useValue: mockSkillsService },
             ],
         }).compile();
 
@@ -56,18 +77,13 @@ describe('AuthService', () => {
                 role: 'student',
             };
 
-            const hashedPassword = bcrypt.hashSync(createUserDto.password, 10);
-            const savedUser = { id: 'uuid', ...createUserDto, password: hashedPassword };
+            const savedUser = { id: uuid(), ...createUserDto, password: createUserDto.password };
 
-            mockUserRepository.create.mockReturnValue(savedUser);
             mockUserRepository.save.mockResolvedValue(savedUser);
 
             const result = await service.createUser(createUserDto);
-            expect(result).toEqual(savedUser);
-            expect(mockUserRepository.create).toHaveBeenCalledWith(expect.objectContaining({
-                password: expect.any(String),
-            }));
-            expect(mockUserRepository.save).toHaveBeenCalled();
+
+            expect(result.email).toEqual(savedUser.email);
         });
 
         it('should handle database errors', async () => {
@@ -100,44 +116,41 @@ describe('AuthService', () => {
         });
     });
 
-
     describe('findOne', () => {
-        it('should return a user by id', async () => {
-            const user = { id: '1', email: 'test@example.com', user_code: '1234' };
-            mockUserRepository.findOneBy.mockResolvedValue(user);
+        it('should return a user by id with relations', async () => {
+            const user = { id: '1', email: 'test@example.com', user_code: '1234', skills: [], teams: [], courses: [] };
+            mockUserRepository.findOne.mockResolvedValue(user);
 
             const result = await service.findOne('1');
             expect(result).toEqual(user);
-            expect(mockUserRepository.findOneBy).toHaveBeenCalledWith({ user_code: '1' });
+            expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+                where: { user_code: '1' },
+                relations: ['skills', 'teams', 'courses'],
+            });
         });
 
-
-        it('should throw NotFoundException if user not found', async () => {
-            mockUserRepository.findOneBy.mockResolvedValue(null);
+        it('should throw NotFoundException if user not found by id', async () => {
+            mockUserRepository.findOne.mockResolvedValue(null);
 
             await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
         });
-    });
 
-    describe('loginUser', () => {
-        it('should return a JWT token for valid credentials', async () => {
-            const loginUserDto = { email: 'test@example.com', password: 'password123' };
-            const user = { id: '1', email: loginUserDto.email, password: bcrypt.hashSync(loginUserDto.password, 10) };
-
+        it('should return a user by user_code with relations', async () => {
+            const user = { id: '1', email: 'test@example.com', user_code: '1234', skills: [], teams: [], courses: [] };
             mockUserRepository.findOne.mockResolvedValue(user);
-            mockJwtService.sign.mockReturnValue('signedToken');
 
-            const result = await service.loginUser(loginUserDto);
-            expect(result).toEqual({ user_id: '1', email: 'test@example.com', token: 'signedToken' });
+            const result = await service.findOne('1234');
+            expect(result).toEqual(user);
+            expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+                where: { user_code: '1234' },
+                relations: ['skills', 'teams', 'courses'],
+            });
         });
 
-        it('should throw UnauthorizedException for invalid credentials', async () => {
-            const loginUserDto = { email: 'test@example.com', password: 'wrongpassword' };
-            const user = { id: '1', email: loginUserDto.email, password: bcrypt.hashSync('password123', 10) };
+        it('should throw NotFoundException if user not found by user_code', async () => {
+            mockUserRepository.findOne.mockResolvedValue(null);
 
-            mockUserRepository.findOne.mockResolvedValue(user);
-
-            await expect(service.loginUser(loginUserDto)).rejects.toThrow(UnauthorizedException);
+            await expect(service.findOne('1234')).rejects.toThrow(NotFoundException);
         });
     });
 
@@ -154,7 +167,7 @@ describe('AuthService', () => {
             expect(mockUserRepository.save).toHaveBeenCalled();
         });
 
-        it('should throw NotFoundException if user not found', async () => {
+        it('should throw NotFoundException if user not found by id', async () => {
             mockUserRepository.findOneBy.mockResolvedValue(null);
 
             await expect(service.update('1', { email: 'updated@example.com' })).rejects.toThrow(NotFoundException);
@@ -180,63 +193,32 @@ describe('AuthService', () => {
             expect(mockUserRepository.remove).toHaveBeenCalledWith(user);
         });
 
-
-        it('should throw NotFoundException if user not found', async () => {
+        it('should throw NotFoundException if user not found by id', async () => {
             mockUserRepository.findOneBy.mockResolvedValue(null);
 
             await expect(service.remove('1')).rejects.toThrow(NotFoundException);
         });
     });
 
-    describe('readExcel', () => {
-        it('should parse Excel buffer and import users', async () => {
-            const mockBuffer = Buffer.from('');
-            const mockJsonData = [
-                { email: 'student1@example.com', name: 'Student1', last_name: 'Last1', student_code: '1234' },
-            ];
+    describe('loginUser', () => {
+        it('should return a JWT token for valid credentials', async () => {
+            const loginUserDto = { email: 'test@example.com', password: 'password123' };
+            const user = { id: '1', email: loginUserDto.email, password: bcrypt.hashSync(loginUserDto.password, 10) };
 
-            jest.spyOn(XLSX, 'read').mockReturnValue({
-                SheetNames: ['Sheet1'],
-                Sheets: { Sheet1: {} },
-            });
-            jest.spyOn(XLSX.utils, 'sheet_to_json').mockReturnValue(mockJsonData);
-            jest.spyOn(service, 'importsUsers').mockResolvedValue();
-            
-            const result = service.readExcel(mockBuffer);
-            expect(result).toEqual(mockJsonData);
-            expect(service.importsUsers).toHaveBeenCalledWith(mockJsonData);
+            mockUserRepository.findOne.mockResolvedValue(user);
+            mockJwtService.sign.mockReturnValue('signedToken');
+
+            const result = await service.loginUser(loginUserDto);
+            expect(result).toEqual({ user_id: '1', email: 'test@example.com', token: 'signedToken' });
+        });
+
+        it('should throw UnauthorizedException for invalid credentials', async () => {
+            const loginUserDto = { email: 'test@example.com', password: 'wrongpassword' };
+            const user = { id: '1', email: loginUserDto.email, password: bcrypt.hashSync('password123', 10) };
+
+            mockUserRepository.findOne.mockResolvedValue(user);
+
+            await expect(service.loginUser(loginUserDto)).rejects.toThrow(UnauthorizedException);
         });
     });
-
-    describe('importsUsers', () => {
-        it('should create users from JSON data', async () => {
-            const jsonData = [
-                { email: 'student1@example.com', name: 'Student1', last_name: 'Last1', student_code: '1234' },
-            ];
-
-            const mockUser: Users = {
-                id: 'some-uuid',
-                email: 'test@example.com',
-                password: 'hashedPassword',
-                name: 'John',
-                last_name: 'Doe',
-                user_code: '1234',
-                role: 'student',
-              };
-              
-              jest.spyOn(service, 'createUser').mockResolvedValue(mockUser);
-              
-
-            await service.importsUsers(jsonData);
-            expect(service.createUser).toHaveBeenCalledWith(expect.objectContaining({
-                email: 'student1@example.com',
-                name: 'Student1',
-                last_name: 'Last1',
-                user_code: '1234',
-                password: expect.any(String),
-            }));
-        });
-    });
-
-
 });

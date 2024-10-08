@@ -5,15 +5,25 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Team } from './entities/teams.entity';
 import { NotFoundException } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
+import { AuthService } from '../auth/auth.service';
+import { Users } from '../auth/entities/user.entity';
 
 describe('TeamsService', () => {
   let service: TeamsService;
   let repository: Repository<Team>;
+  let authService: AuthService;
+
+  const mockUser = {
+    id: uuid(),
+    name: 'User A',
+    teams: [],
+  } as Users;
 
   const mockTeam = {
     id: uuid(),
     name: 'Team A',
-  };
+    users: [mockUser],
+  } as Team;
 
   const mockTeamsRepository = {
     find: jest.fn().mockResolvedValue([mockTeam]),
@@ -21,6 +31,11 @@ describe('TeamsService', () => {
     save: jest.fn().mockResolvedValue(mockTeam),
     update: jest.fn().mockResolvedValue({ affected: 1 }),
     delete: jest.fn().mockResolvedValue({ affected: 1 }),
+  };
+
+  const mockAuthService = {
+    findOne: jest.fn().mockResolvedValue(mockUser),
+    update: jest.fn().mockResolvedValue(mockUser),
   };
 
   beforeEach(async () => {
@@ -31,11 +46,16 @@ describe('TeamsService', () => {
           provide: getRepositoryToken(Team),
           useValue: mockTeamsRepository,
         },
+        {
+          provide: AuthService,
+          useValue: mockAuthService,
+        },
       ],
     }).compile();
 
     service = module.get<TeamsService>(TeamsService);
     repository = module.get<Repository<Team>>(getRepositoryToken(Team));
+    authService = module.get<AuthService>(AuthService);
   });
 
   it('should be defined', () => {
@@ -65,7 +85,9 @@ describe('TeamsService', () => {
 
   describe('create', () => {
     it('should create and return a new team', async () => {
-      const createTeamsDto = { name: 'Team B' };
+      const createTeamsDto = { name: 'Team B', users: '1' };
+      mockAuthService.findOne = jest.fn().mockResolvedValue(mockUser);
+
       const result = await service.create(createTeamsDto);
       expect(result).toEqual(mockTeam);
       expect(repository.save).toHaveBeenCalledWith(expect.objectContaining({ name: createTeamsDto.name }));
@@ -74,23 +96,33 @@ describe('TeamsService', () => {
 
   describe('update', () => {
     it('should update and return the updated team', async () => {
-      const updateTeamsDto = { name: 'Updated Team' };
-
+      const updateTeamsDto = { 
+        id: mockTeam.id, 
+        name: 'Updated Team',
+        users: '1',
+      };
+  
       mockTeamsRepository.findOne = jest.fn().mockResolvedValue(mockTeam);
-
+  
       const result = await service.update(mockTeam.id, updateTeamsDto);
       expect(result).toEqual(mockTeam);
-      expect(repository.update).toHaveBeenCalledWith(mockTeam.id, updateTeamsDto);
+      expect(repository.save).toHaveBeenCalledWith(expect.objectContaining(updateTeamsDto));
       expect(repository.findOne).toHaveBeenCalledWith({ where: { id: mockTeam.id } });
     });
-
+  
     it('should throw NotFoundException if team not found during update', async () => {
       mockTeamsRepository.findOne = jest.fn().mockResolvedValue(null);
-
-      const updateTeamsDto = { name: 'Non-existent Team' };
+  
+      const updateTeamsDto = { 
+        id: uuid(),
+        name: 'Non-existent Team',
+        users: '1',
+      };
+      
       await expect(service.update(uuid(), updateTeamsDto)).rejects.toThrow(NotFoundException);
     });
   });
+  
 
   describe('remove', () => {
     it('should remove a team and return void', async () => {
@@ -108,4 +140,23 @@ describe('TeamsService', () => {
     });
   });
 
+  describe('addTeamToUser', () => {
+    it('should add a team to a user and return the updated user', async () => {
+      mockTeamsRepository.findOne = jest.fn().mockResolvedValue(mockTeam);
+      mockAuthService.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      const result = await service.addTeamToUser(mockTeam.id, mockUser.id);
+      expect(result).toEqual(mockUser);
+      expect(mockAuthService.update).toHaveBeenCalledWith(mockUser.id, expect.objectContaining({
+        teams: expect.arrayContaining([mockTeam]),
+      }));
+    });
+
+    it('should throw NotFoundException if team or user not found', async () => {
+      mockTeamsRepository.findOne = jest.fn().mockResolvedValue(null);
+
+      await expect(service.addTeamToUser(uuid(), mockUser.id)).rejects.toThrow(NotFoundException);
+      await expect(service.addTeamToUser(mockTeam.id, uuid())).rejects.toThrow(NotFoundException);
+    });
+  });
 });

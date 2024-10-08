@@ -13,6 +13,7 @@ import { Rubric } from 'src/rubric/entities/rubric.entity';
   ],
   controllers: [CriteriaController],
   providers: [CriteriaService],
+  exports: [CriteriaService]
   
 })
 export class CriteriaModule {}

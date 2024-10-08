@@ -1,5 +1,6 @@
+import { CriteriaGrade } from "../../criteria_grade/entities/criteria_grade.entity";
 import { Rubric } from "../../rubric/entities/rubric.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Criteria {
@@ -19,4 +20,8 @@ export class Criteria {
     @ManyToOne(() => Rubric, (rubric) => rubric.criterias, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'rubric_id' })
     rubric: Rubric; 
+
+    @OneToMany(() => CriteriaGrade, (criteriaGrade) => criteriaGrade.criteria)
+    criteriaGrades: CriteriaGrade[];
+
 }

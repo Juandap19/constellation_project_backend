@@ -38,7 +38,7 @@ describe('CriteriaController', () => {
         percentage: 50,
         rubric: '123e4567-e89b-12d3-a456-426614174000',
       };
-      const expectedResult = { id: 'some-uuid', ...createCriteriaDto };
+      const expectedResult = { id: '123456789', ...createCriteriaDto };
 
       mockCriteriaService.create.mockResolvedValue(expectedResult);
 
@@ -81,6 +81,8 @@ describe('CriteriaController', () => {
         description: 'Updated Description',
         percentage: 75,
         rubric: '123e4567-e89b-12d3-a456-426614174000',
+        student: '123e456',
+        studentEval: '123e987',
       };
       const expectedResult = { id, ...updateCriteriaDto };
 

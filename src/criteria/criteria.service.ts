@@ -4,7 +4,7 @@ import { UpdateCriteriaDto } from './dto/update-criteria.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Criteria } from './entities/criteria.entity';
 import { Repository } from 'typeorm';
-import { Rubric } from 'src/rubric/entities/rubric.entity';
+import { Rubric } from '../rubric/entities/rubric.entity';
 import { RubricService } from '../rubric/rubric.service';
 import { v4 as uuid } from 'uuid';
 

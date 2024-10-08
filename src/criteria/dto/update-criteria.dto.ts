@@ -6,6 +6,12 @@ export class UpdateCriteriaDto extends PartialType(CreateCriteriaDto) {
 
     @IsUUID()
     readonly rubric: string;
+
+    @IsUUID()
+    readonly student: string;
+
+    @IsUUID()
+    readonly studentEval: string;
     
     @IsNotEmpty()
     @IsString()

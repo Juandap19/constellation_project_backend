@@ -31,4 +31,16 @@ export class CoursesController {
   remove(@Param('id') id: string) {
     return this.coursesService.remove(id);
   }
+
+  @Post(':courseId/user/:userId')
+  addCourseToUser(@Param('courseId') courseId: string, @Param('userId') userId: string) {
+    return this.coursesService.addCourseToUser(courseId, userId);
+  }
+
+  @Post('teams/:courseId')
+  createGroups(@Param('courseId') courseId: string) {
+    return this.coursesService.createGroups(courseId);
+     
+  }
+
 }

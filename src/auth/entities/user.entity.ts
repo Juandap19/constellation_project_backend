@@ -1,5 +1,8 @@
-import {Column , Entity , PrimaryGeneratedColumn} from 'typeorm';
-
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
+import { Schedule } from '../../schedule/entities/schedule.entity';
+import { Skills } from '../../skills/entities/skill.entity';
+import { Team } from '../../teams/entities/teams.entity';
+import { Course } from '../../courses/entities/course.entity';
 
 @Entity()
 export class Users {
@@ -24,5 +27,20 @@ export class Users {
 
     @Column('text')
     user_code: string;
+
+    @OneToMany(() => Schedule, (schedule) => schedule.user , {cascade: true})
+    schedules: Schedule[];
+
+    @ManyToMany(() => Skills, skill => skill.users, { cascade: true })
+    @JoinTable()
+    skills: Skills[];
+
+    @ManyToMany(()=> Team , (team) => team.users, {cascade: true})
+    @JoinTable()
+    teams: Team[];
+
+    @ManyToMany(() => Course, (course) => course.users, {cascade: true})
+    @JoinTable()
+    courses: Course[];
 
 }

@@ -31,7 +31,7 @@ describe('CoursesController', () => {
 
   describe('create', () => {
     it('should create a new course', async () => {
-      const createCourseDto: CreateCourseDto = { id:'1',name: 'Test Course' };
+      const createCourseDto: CreateCourseDto = { id:'1',name: 'Test Course', users: '1' };
       mockCoursesService.create.mockResolvedValue(createCourseDto);
 
       expect(await controller.create(createCourseDto)).toBe(createCourseDto);
@@ -60,7 +60,7 @@ describe('CoursesController', () => {
 
   describe('update', () => {
     it('should update a course', async () => {
-      const updateCourseDto: UpdateCourseDto = { id:'1', name: 'Updated Course' };
+      const updateCourseDto: UpdateCourseDto = { id:'1', name: 'Updated Course', users: '1' };
       const result = { id: '1', ...updateCourseDto };
       mockCoursesService.update.mockResolvedValue(result);
 

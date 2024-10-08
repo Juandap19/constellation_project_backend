@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,51 +10,50 @@ import { BadRequestException, InternalServerErrorException } from '@nestjs/commo
 import { v4 as uuid } from 'uuid';
 import { isUUID } from 'class-validator';
 import { NotFoundException } from '@nestjs/common';
+import { Skills } from '../skills/entities/skill.entity';
+import { SkillsService } from '../skills/skills.service';
+import { forwardRef } from '@nestjs/common';
+import { create } from 'domain';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as XLSX from 'xlsx';
+import { TeamsService } from '../teams/teams.service';
 
 
 @Injectable()
 export class AuthService {
 
   constructor(
-    @InjectRepository(Users) private readonly userRepository: Repository<Users>, private readonly jwtService: JwtService
-) {}
+    @InjectRepository(Users) private readonly userRepository: Repository<Users>, @Inject(forwardRef(() => SkillsService)) private readonly skillsService: SkillsService, private readonly jwtService: JwtService ,  @Inject(forwardRef(() => TeamsService))private readonly teamService: TeamsService
+  ) { }
 
-async createUser(createUserDto: CreateUserDto) {
-  try{
-      const {password, ...userData} = createUserDto;
+  async createUser(createUserDto: CreateUserDto) {
+    try {
+      const { password, ...userData } = createUserDto;
+      const user = Object.assign({ id: uuid(), password: bcrypt.hashSync(password, 10), ...userData });
+      return await this.userRepository.save(user);
 
-      const user = this.userRepository.create({
-          id: uuid(),
-          password : bcrypt.hashSync(password, 10),
-          ...userData});
-
-      await  this.userRepository.save(user);
-
-      return user;
-
-  }catch(e) {
-    this.handleDBErrors(e);
+    } catch (e) {
+      this.handleDBErrors(e);
+    }
   }
-}
 
   findAll() {
     return this.userRepository.find();
   }
 
-  async findOne(id: string) {
+  async findOne(identifier: string) {
+    //const user = await this.userRepository.findOne({ where: { id }, relations: ['skills'] });
     let user: Users;
 
-    if(isUUID(id)){
-      user = await this.userRepository.findOneBy({id: id})
-    }else{
-      user = await this.userRepository.findOneBy({user_code: id})
+    if (isUUID(identifier)) {
+      user = await this.userRepository.findOne({ where: {id: identifier}, relations: ['skills', 'teams', 'courses'] })
+    } else {
+      user = await this.userRepository.findOne({ where: {user_code: identifier} , relations: ['skills', 'teams', 'courses'] })
     }
 
-    if(!user){
-      throw new NotFoundException(`User with the id ${id} not found`)
+    if (!user) {
+      throw new NotFoundException(`User with the id ${identifier} not found`);
     }
 
     return user;
@@ -62,16 +62,22 @@ async createUser(createUserDto: CreateUserDto) {
   async update(identifier: string, updateUserDto: UpdateUserDto) {
     let user: Users;
 
-    if(isUUID(identifier)){
-      user = await this.userRepository.findOneBy({id: identifier})
-    }else{
-      user = await this.userRepository.findOneBy({user_code: identifier})
+    if (isUUID(identifier)) {
+      user = await this.userRepository.findOneBy({ id: identifier })
+    } else {
+      user = await this.userRepository.findOneBy({ user_code: identifier })
     }
-  
+
     if (!user) {
       throw new NotFoundException(`User not found with id or student_code: ${identifier}`);
     }
-  
+
+    if (updateUserDto.password) {
+      user.password = bcrypt.hashSync(updateUserDto.password, 10);
+    } else {
+      delete updateUserDto.password;
+    }
+
     user.email = updateUserDto.email || user.email;
     user.name = updateUserDto.name || user.name;
     if (updateUserDto.password) {
@@ -80,9 +86,10 @@ async createUser(createUserDto: CreateUserDto) {
 
     user.last_name = updateUserDto.last_name || user.last_name;
     user.user_code = updateUserDto.user_code || user.user_code;
+    user.skills = updateUserDto.skills || user.skills;
+    user.teams = updateUserDto.teams || user.teams;
+    user.courses = updateUserDto.courses || user.courses;
 
-
-  
     return this.userRepository.save(user);
   }
 
@@ -90,17 +97,17 @@ async createUser(createUserDto: CreateUserDto) {
 
     let user: Users;
 
-    if(isUUID(identifier)){
-      user = await this.userRepository.findOneBy({id: identifier})
-    }else{
-      user = await this.userRepository.findOneBy({user_code: identifier})
+    if (isUUID(identifier)) {
+      user = await this.userRepository.findOneBy({ id: identifier })
+    } else {
+      user = await this.userRepository.findOneBy({ user_code: identifier })
     }
-  
+
     if (!user) {
       throw new NotFoundException(`User not found with id or student_code: ${identifier}`);
     }
 
-  
+
     if (!user) {
       throw new NotFoundException(`User not found with id or student_code: ${identifier}`);
     }
@@ -110,25 +117,26 @@ async createUser(createUserDto: CreateUserDto) {
 
 
   private handleDBErrors(error: any) {
-    if(error.code === '23505') {
-        throw new BadRequestException('User already exists');
+    if (error.code === '23505') {
+      throw new BadRequestException('User already exists');
     }
-
+    console.log(error);
     throw new InternalServerErrorException('Error creating user');
   }
 
-  async  loginUser(loginUserDto: LoginUserDto){
-    const {email, password} = loginUserDto;
+  async loginUser(loginUserDto: LoginUserDto) {
+    const { email, password } = loginUserDto;
     const user = await this.userRepository.findOne({
-        where: {email}, 
-        select: ['id', 'email', 'password']
-        });
-    if(!user || !bcrypt.compareSync(password, user.password)) 
-        throw new UnauthorizedException('Invalid credentials');
+      where: { email },
+      select: ['id', 'email', 'password']
+    });
+    if (!user || !bcrypt.compareSync(password, user.password))
+      throw new UnauthorizedException('Invalid credentials');
 
-    
-    return { user_id: user.id, email: user.email,
-        token: this.jwtService.sign({user_id: user.id})
+
+    return {
+      user_id: user.id, email: user.email,
+      token: this.jwtService.sign({ user_id: user.id })
     };
   }
 
@@ -137,9 +145,9 @@ async createUser(createUserDto: CreateUserDto) {
     const workbook = XLSX.read(buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-  
+
     const jsonData = XLSX.utils.sheet_to_json(sheet);
-  
+
     this.importsUsers(jsonData)
     return jsonData;
   }
@@ -154,9 +162,9 @@ async createUser(createUserDto: CreateUserDto) {
       }
 
       student_user.email = person.email;
-      student_user.name = person.name; 
+      student_user.name = person.name;
       student_user.last_name = person.last_name;
-      student_user.password = person.password || 'ICESI_2024-1'; 
+      student_user.password = person.password || 'ICESI_2024-1';
       student_user.user_code = person.student_code;
       student_user.role = "student";
 
