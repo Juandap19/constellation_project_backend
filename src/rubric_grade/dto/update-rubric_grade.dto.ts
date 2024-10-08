@@ -1,15 +1,18 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateRubricGradeDto } from './create-rubric_grade.dto';
-import { IsInt, IsNotEmpty, IsUUID } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 
 export class UpdateRubricGradeDto extends PartialType(CreateRubricGradeDto) {
 
     @IsUUID()
-    readonly rubric?: string;
+    @IsOptional()
+    readonly rubric: string;
 
     @IsUUID()
-    readonly student?: string;
+    @IsOptional()
+    readonly student: string;
 
     @IsUUID()
-    readonly studentEval?: string;
+    @IsOptional()
+    readonly studentEval: string;
 }

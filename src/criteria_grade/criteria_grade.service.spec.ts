@@ -113,7 +113,7 @@ describe('CriteriaGradeService', () => {
     });
 
     it('should throw an exception when updating a non-existing criteria grade', async () => {
-        const updateCriteriaGradeDto = { criteria: 'non-existing-criteria' };
+        const updateCriteriaGradeDto = { criteria: 'non-existing-criteria', student: null, studentEval: null, grade: 0 };
 
         try {
             await service.update('non-existing-id', updateCriteriaGradeDto);

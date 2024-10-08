@@ -90,7 +90,7 @@ describe('RubricGradeService', () => {
     });
 
     it('should throw an exception when updating a non-existing rubric grade', async () => {
-        const updateRubricGradeDto = { rubric: 'non-existing-rubric' };
+        const updateRubricGradeDto = { rubric: 'non-existing-rubric', student: null, studentEval: null };
     
         try {
             await service.update('non-existing-id', updateRubricGradeDto);

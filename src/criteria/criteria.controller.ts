@@ -18,11 +18,13 @@ export class CriteriaController {
   }
 
   @Get()
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   findAll() {
     return this.criteriaService.findAll();
   }
 
   @Get(':id')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.criteriaService.findOne(id);
   }
