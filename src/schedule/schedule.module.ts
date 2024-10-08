@@ -3,8 +3,8 @@ import { ScheduleService } from './schedule.service';
 import { ScheduleController } from './schedule.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Schedule } from './entities/schedule.entity';
-import { AuthModule } from 'src/auth/auth.module';
-import { Users } from  'src/auth/entities/user.entity';
+import { AuthModule } from '../auth/auth.module';
+import { Users } from  '../auth/entities/user.entity';
 
 @Module({
   controllers: [ScheduleController],

@@ -18,13 +18,14 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as XLSX from 'xlsx';
 import { TeamsService } from '../teams/teams.service';
+import { CoursesService } from '../courses/courses.service';
 
 
 @Injectable()
 export class AuthService {
 
   constructor(
-    @InjectRepository(Users) private readonly userRepository: Repository<Users>, @Inject(forwardRef(() => SkillsService)) private readonly skillsService: SkillsService, private readonly jwtService: JwtService ,  @Inject(forwardRef(() => TeamsService))private readonly teamService: TeamsService
+    @InjectRepository(Users) private readonly userRepository: Repository<Users>, @Inject(forwardRef(() => SkillsService)) private readonly skillsService: SkillsService, private readonly jwtService: JwtService ,  @Inject(forwardRef(() => TeamsService))private readonly teamService: TeamsService ,@Inject(forwardRef(() => CoursesService))  private readonly courseService: CoursesService 
   ) { }
 
   async createUser(createUserDto: CreateUserDto) {
@@ -141,20 +142,20 @@ export class AuthService {
   }
 
 
-  readExcel(buffer: Buffer): any[] {
+  readExcel(buffer: Buffer, id:string): any[] {
     const workbook = XLSX.read(buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
     const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-    this.importsUsers(jsonData)
+    this.importsUsers(jsonData, id)
     return jsonData;
   }
 
-  async importsUsers(jsonData: any[]): Promise<void> {
+  async importsUsers(jsonData: any[], id: string): Promise<void> {
     for (const person of jsonData) {
-      const student_user = new CreateUserDto();
+      let student_user = new CreateUserDto();
 
       if (!person.email) {
         console.error('Missing email for person:', person);
@@ -167,13 +168,28 @@ export class AuthService {
       student_user.password = person.password || 'ICESI_2024-1';
       student_user.user_code = person.student_code;
       student_user.role = "student";
+      let returnStudent  = null ;
 
       try {
-        await this.createUser(student_user);
+        console.log(!(await this.userRepository.findBy({email: student_user.email})));
+        console.log(await this.userRepository.findBy({email: student_user.email}));
+
+
+        if ((await this.userRepository.findBy({ email: student_user.email })).length === 0) {
+          returnStudent = await this.createUser(student_user);
+        } else {
+          returnStudent = await this.userRepository.findBy({ email: student_user.email });
+        }
+
+        await this.setStudentCourse(id, returnStudent.id);
       } catch (error) {
         console.error('Error creating user:', error);
       }
     }
+  }
+
+  async setStudentCourse(idCourse: string, idStudent: string){
+    await this.courseService.addCourseToUser(idCourse, idStudent);
   }
 
 

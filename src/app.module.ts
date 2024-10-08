@@ -45,7 +45,6 @@ import { RubricGradeModule } from './rubric_grade/rubric_grade.module';
     CriteriaGradeModule,
     RubricGradeModule,
   ],
-  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

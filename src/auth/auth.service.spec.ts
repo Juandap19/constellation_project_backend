@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import { TeamsService } from '../teams/teams.service';
 import { SkillsService } from '../skills/skills.service';
+import { CoursesService } from '../courses/courses.service';
 
 describe('AuthService', () => {
     let service: AuthService;
@@ -46,6 +47,15 @@ describe('AuthService', () => {
         remove: jest.fn(),
     };
 
+    const mockCoursesService = {
+        findOne: jest.fn(),
+        findAll: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        remove: jest.fn(),
+    };
+    
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -54,8 +64,10 @@ describe('AuthService', () => {
                 { provide: JwtService, useValue: mockJwtService },
                 { provide: TeamsService, useValue: mockTeamService },
                 { provide: SkillsService, useValue: mockSkillsService },
+                { provide: CoursesService, useValue: mockCoursesService }, // Aquí se agrega el mock
             ],
         }).compile();
+    
 
         service = module.get<AuthService>(AuthService);
         userRepository = module.get<Repository<Users>>(getRepositoryToken(Users));

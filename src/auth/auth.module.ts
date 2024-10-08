@@ -7,17 +7,17 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { Skills } from 'src/skills/entities/skill.entity';
-import { SkillsModule } from 'src/skills/skills.module';
-import { Team } from 'src/teams/entities/teams.entity';
-import { TeamsModule } from 'src/teams/teams.module';
-import { Course } from 'src/courses/entities/course.entity';
-import { CoursesModule } from 'src/courses/courses.module';
+import { Skills } from '../skills/entities/skill.entity';
+import { SkillsModule } from '../skills/skills.module';
+import { Team } from '../teams/entities/teams.entity';
+import { TeamsModule } from '../teams/teams.module';
+import { Course } from '../courses/entities/course.entity';
+import { CoursesModule } from '../courses/courses.module';
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  exports: [AuthService, PassportModule, JwtModule],
   imports: [
     TypeOrmModule.forFeature([Users]),
     ConfigModule,

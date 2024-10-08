@@ -5,15 +5,15 @@ import { IsInt, IsNotEmpty, IsUUID } from 'class-validator';
 export class UpdateCriteriaGradeDto extends PartialType(CreateCriteriaGradeDto) {
 
     @IsUUID()
-    readonly criteria: string;
+    readonly criteria?: string;
 
     @IsUUID()
-    readonly student: string;
+    readonly student?: string;
 
     @IsUUID()
-    readonly studentEval: string;
+    readonly studentEval?: string;
     
     @IsNotEmpty()
     @IsInt()
-    grade: number;
+    grade?: number;
 }

@@ -122,14 +122,15 @@ describe('AuthController', () => {
         const mockFile = {
             buffer: Buffer.from('file content'),
         } as Express.Multer.File;
-
-        const result = controller.uploadFile(mockFile);
-
-        expect(mockAuthService.readExcel).toHaveBeenCalledWith(mockFile.buffer);
+    
+        const result = controller.uploadFile('1', mockFile);
+    
+        expect(mockAuthService.readExcel).toHaveBeenCalledWith(mockFile.buffer, '1');
         expect(result).toEqual({ message: 'uploaded and processed', data: { message: 'processed' } });
     });
+    
 
     it('should throw a BadRequestException if no file is uploaded', () => {
-        expect(() => controller.uploadFile(null)).toThrow(BadRequestException);
+        expect(() => controller.uploadFile(null,null)).toThrow(BadRequestException);
     });
 });
