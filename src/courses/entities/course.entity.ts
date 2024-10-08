@@ -1,8 +1,8 @@
-import { Activity } from "src/activity/entities/activity.entity";
+import { Activity } from "../../activity/entities/activity.entity";
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { Users } from "src/auth/entities/user.entity";
+import { Users } from "../../auth/entities/user.entity";
 import { ManyToMany } from "typeorm";
-import { Team } from "src/teams/entities/teams.entity";
+import { Team } from "../../teams/entities/teams.entity";
 
 @Entity()
 export class Course {

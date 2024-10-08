@@ -5,7 +5,7 @@ import { Activity } from './entities/activity.entity';
 import { CreateActivityDto } from './dto/create-activitty.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { v4 as uuid } from 'uuid';
-import { CoursesService } from 'src/courses/courses.service';
+import { CoursesService } from '../courses/courses.service';
 
 @Injectable()
 export class ActivityService {

@@ -5,11 +5,11 @@ import { IsInt, IsNotEmpty, IsUUID } from 'class-validator';
 export class UpdateRubricGradeDto extends PartialType(CreateRubricGradeDto) {
 
     @IsUUID()
-    readonly rubric: string;
+    readonly rubric?: string;
 
     @IsUUID()
-    readonly student: string;
+    readonly student?: string;
 
     @IsUUID()
-    readonly studentEval: string;
+    readonly studentEval?: string;
 }

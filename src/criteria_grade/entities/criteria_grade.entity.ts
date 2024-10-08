@@ -1,5 +1,5 @@
-import { Users } from "src/auth/entities/user.entity";
-import { Criteria } from "src/criteria/entities/criteria.entity";
+import { Users } from "../../auth/entities/user.entity";
+import { Criteria } from "../../criteria/entities/criteria.entity";
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

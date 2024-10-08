@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { Users } from 'src/auth/entities/user.entity';
+import { Users } from '../../auth/entities/user.entity';
 
 @Entity()
 export class Schedule {

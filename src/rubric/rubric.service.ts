@@ -5,7 +5,7 @@ import { Rubric } from './entities/rubric.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-import { Activity } from 'src/activity/entities/activity.entity';
+import { Activity } from '../activity/entities/activity.entity';
 
 @Injectable()
 export class RubricService {

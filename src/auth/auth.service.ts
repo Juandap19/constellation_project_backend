@@ -10,15 +10,15 @@ import { BadRequestException, InternalServerErrorException } from '@nestjs/commo
 import { v4 as uuid } from 'uuid';
 import { isUUID } from 'class-validator';
 import { NotFoundException } from '@nestjs/common';
-import { Skills } from 'src/skills/entities/skill.entity';
-import { SkillsService } from 'src/skills/skills.service';
+import { Skills } from '../skills/entities/skill.entity';
+import { SkillsService } from '../skills/skills.service';
 import { forwardRef } from '@nestjs/common';
 import { create } from 'domain';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as XLSX from 'xlsx';
-import { TeamsService } from 'src/teams/teams.service';
-import { CoursesService } from 'src/courses/courses.service';
+import { TeamsService } from '../teams/teams.service';
+import { CoursesService } from '../courses/courses.service';
 
 
 @Injectable()

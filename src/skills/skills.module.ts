@@ -3,8 +3,8 @@ import { SkillsService } from './skills.service';
 import { SkillsController } from './skills.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Skills } from './entities/skill.entity';
-import { AuthModule } from 'src/auth/auth.module';
-import { Users } from 'src/auth/entities/user.entity';
+import { AuthModule } from '../auth/auth.module';
+import { Users } from '../auth/entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({

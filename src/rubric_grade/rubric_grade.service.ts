@@ -6,9 +6,9 @@ import { RubricGrade } from './entities/rubric_grade.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { CriteriaService } from 'src/criteria/criteria.service';
-import { AuthService } from 'src/auth/auth.service';
-import { RubricService } from 'src/rubric/rubric.service';
-import { CriteriaGrade } from 'src/criteria_grade/entities/criteria_grade.entity';
+import { AuthService } from '../auth/auth.service';
+import { RubricService } from '../rubric/rubric.service';
+import { CriteriaGrade } from '../criteria_grade/entities/criteria_grade.entity';
 
 @Injectable()
 export class RubricGradeService {
