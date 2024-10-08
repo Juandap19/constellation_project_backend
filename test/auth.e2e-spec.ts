@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AuthModule } from '../src/auth/auth.module';
 import { AuthService } from '../src/auth/auth.service';
 import { Users } from '../src/auth/entities/user.entity';
 import { AppModule } from '../src/app.module';
 import { v4 as uuid } from 'uuid';
+import { LoginUserDto } from '../src/auth/dto/login-user.dto';
+import { UnauthorizedException } from '@nestjs/common';
 
 describe('UsersController (e2e)', () => {
     let app: INestApplication;
@@ -40,7 +41,14 @@ describe('UsersController (e2e)', () => {
         },
     ];
 
-    const mockUserService = {
+    const mockAuthService = {
+        loginUser: jest.fn(({ email, password }: LoginUserDto) => {
+            const user = users.find(user => user.email === email && user.password === password);
+            if (!user) {
+                throw new UnauthorizedException();
+            }
+            return { access_token: 'mocked-token' };
+        }),
         findAll: jest.fn(() => users),
         findOne: jest.fn((id: string) => users.find(user => user.id === id)),
         createUser: jest.fn((data: Users) => ({ id: '4', ...data })),
@@ -48,20 +56,34 @@ describe('UsersController (e2e)', () => {
         remove: jest.fn((id: string) => ({})),
     };
 
-    const mockJwtService = {
-        sign: jest.fn(() => 'mocked-token'),
-    };
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule],
         })
             .overrideProvider(AuthService)
-            .useValue(mockUserService)
+            .useValue(mockAuthService)
             .compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();
+    }, 70 * 1000);
+
+    it('/login (POST)', async () => {
+        const loginDto = {
+            email: 'testuser1@gmail.com',
+            password: '123456',
+        };
+
+        return request(app.getHttpServer())
+            .post('/auth/login')
+            .send(loginDto)
+            .expect('Content-Type', /json/)
+            .expect(201)
+            .then((response) => {
+                expect(response.body).toEqual({ access_token: 'mocked-token' });
+                expect(mockAuthService.loginUser).toHaveBeenCalledWith(loginDto);
+            });
     });
 
     it('/auth (GET)', async () => {

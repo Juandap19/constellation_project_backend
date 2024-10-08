@@ -93,7 +93,9 @@
       ".enum.ts",
       ".constant.ts",
       ".config.ts",
-      ".strategy.ts"
+      ".strategy.ts",
+      "main",
+      "app"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

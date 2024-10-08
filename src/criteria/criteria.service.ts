@@ -17,7 +17,6 @@ export class CriteriaService {
   async create(criteria: CreateCriteriaDto) {
     const rubric = await this.rubricService.findOne(criteria.rubric);
     const newCriteria = Object.assign({...criteria, rubric, id: uuid()});
-    console.log(newCriteria);
     return await this.criteriaRepository.save(newCriteria);
   }
 

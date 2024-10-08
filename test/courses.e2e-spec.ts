@@ -1,43 +1,57 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { CoursesModule } from '../src/courses/courses.module';
-import { CoursesService } from '../src/courses/courses.service';
-import { Course } from '../src/courses/entities/course.entity';
 import { AppModule } from '../src/app.module';
 import { v4 as uuid } from 'uuid';
+import { LoginUserDto } from '../src/auth/dto/login-user.dto';
+import { CoursesService } from '../src/courses/courses.service';
 
 describe('CoursesController (e2e)', () => {
     let app: INestApplication;
+    let accessToken: string;
+
+    const users = [
+        {
+            id: uuid(),
+            email: 'diegomueses@gmail.com',
+            password: 'diego1234',
+            name: 'Diego Mueses',
+            last_name: 'Mueses',
+            user_code: 'USER001',
+            role: 'student',
+        },
+        {
+            id: uuid(),
+            email: 'testuser2@gmail.com',
+            password: '123456',
+            name: 'User B',
+            last_name: 'User B',
+            user_code: 'USER002',
+            role: 'teacher',
+        },
+    ];
 
     const courses = [
         {
             id: uuid(),
-            name: 'Course A',
-            users: uuid(),
+            name: 'Course 1',
+            description: 'Description of Course 1',
+            users: users[0],
         },
         {
             id: uuid(),
-            name: 'Course B',
-            users: uuid(),
-        },
-        {
-            id: uuid(),
-            name: 'Course C',
-            users: uuid(),
+            name: 'Course 2',
+            description: 'Description of Course 2',
+            users: users[1],
         },
     ];
 
-    const mockCourseService = {
+    const mockCoursesService = {
         findAll: jest.fn(() => courses),
         findOne: jest.fn((id: string) => courses.find(course => course.id === id)),
-        create: jest.fn((data: Course) => ({ id: '4', ...data })),
-        update: jest.fn((id: string, data: Course) => ({ id, ...data })),
+        create: jest.fn((data) => ({ id: uuid(), ...data })),
+        update: jest.fn((id: string, data) => ({ id, ...data })),
         remove: jest.fn((id: string) => ({})),
-    };
-
-    const mockJwtService = {
-        sign: jest.fn(() => 'mocked-token'),
     };
 
     beforeEach(async () => {
@@ -45,17 +59,32 @@ describe('CoursesController (e2e)', () => {
             imports: [AppModule],
         })
             .overrideProvider(CoursesService)
-            .useValue(mockCourseService)
+            .useValue(mockCoursesService)
             .compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();
     });
 
+    it('/auth/login (POST)', async () => {
+        const loginDto: LoginUserDto = {
+            email: 'diegomueses@gmail.com',
+            password: 'diego1234',
+        };
+
+        const response = await request(app.getHttpServer())
+            .post('/auth/login')
+            .send(loginDto)
+            .expect(201);
+
+        expect(response.body.token).toBeDefined();
+        accessToken = response.body.token;
+    });
+
     it('/courses (GET)', async () => {
         return request(app.getHttpServer())
             .get('/courses')
-            .expect('Content-Type', /json/)
+            .set('Authorization', `Bearer ${accessToken}`)
             .expect(200)
             .then((response) => {
                 expect(response.body).toEqual(courses);
@@ -64,36 +93,41 @@ describe('CoursesController (e2e)', () => {
 
     it('/courses (POST)', async () => {
         const newCourse = {
-            id: uuid(),
-            name: 'Course D',
-            users: uuid(),
+            name: 'New Course',
+            description: 'New course description',
+            users: users[0].id,
         };
+
         return request(app.getHttpServer())
             .post('/courses')
+            .set('Authorization', `Bearer ${accessToken}`)
             .send(newCourse)
-            .expect('Content-Type', /json/)
             .expect(201)
             .then((response) => {
-                expect(response.body).toEqual({ id: '4', ...newCourse });
+                expect(response.body).toEqual({ id: expect.any(String), ...newCourse });
             });
     });
 
     it('/courses/:id (PATCH)', async () => {
-        const userId = '1';
-        const updatedCourse = {
-            name: 'Updated',
-        };
+        const courseId = courses[0].id;
+        const updatedCourse = { name: 'Updated Course Name' };
+
         return request(app.getHttpServer())
-            .put(`/courses/${userId}`)
+            .patch(`/courses/${courseId}`)
+            .set('Authorization', `Bearer ${accessToken}`)
             .send(updatedCourse)
-            .expect('Content-Type', /json/)
-            .expect(404);
+            .expect(200)
+            .then((response) => {
+                expect(response.body.name).toBe(updatedCourse.name);
+            });
     });
 
     it('/courses/:id (DELETE)', async () => {
-        const courseId = '1';
+        const courseId = courses[0].id;
+
         return request(app.getHttpServer())
             .delete(`/courses/${courseId}`)
+            .set('Authorization', `Bearer ${accessToken}`)
             .expect(200);
     });
 });

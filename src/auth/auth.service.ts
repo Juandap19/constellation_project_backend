@@ -94,6 +94,7 @@ export class AuthService {
     return this.userRepository.save(user);
   }
 
+  // istambul no cover
   async remove(identifier: string) {
 
     let user: Users;

@@ -9,7 +9,8 @@ import { Users } from '../auth/entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Team,Users, PassportModule]),
+  imports: [TypeOrmModule.forFeature([Team,Users]),
+  PassportModule.register({ defaultStrategy: 'jwt' }),
   forwardRef(() => AuthModule)
 ],
  exports: [TeamsService],
