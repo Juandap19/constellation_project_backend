@@ -17,11 +17,13 @@ export class RubricController {
   }
 
   @Get()
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   findAll() {
     return this.rubricService.findAll();
   }
 
   @Get(':id')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.rubricService.findOne(id);
   }

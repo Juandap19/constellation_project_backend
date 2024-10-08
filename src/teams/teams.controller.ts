@@ -10,11 +10,13 @@ export class TeamsController {
     constructor(private readonly teamsService: TeamsService) {}
 
     @Get()
+    @Auth(ValidRoles.teacher, ValidRoles.student)
     async findAll() {
         return this.teamsService.findAll();
     }
 
     @Get(':id')
+    @Auth(ValidRoles.teacher, ValidRoles.student)
     async findOne(@Param('id') id: string) {
         return this.teamsService.findOne(id);
     }
