@@ -7,10 +7,10 @@ import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Inject } from '@nestjs/common';
 import { forwardRef } from '@nestjs/common';
-import { AuthService } from 'src/auth/auth.service';
-import { Users } from 'src/auth/entities/user.entity';
-import { Team } from 'src/teams/entities/teams.entity';
-import { TeamsService } from 'src/teams/teams.service';
+import { AuthService } from '../auth/auth.service';
+import { Users } from '../auth/entities/user.entity';
+import { Team } from '../teams/entities/teams.entity';
+import { TeamsService } from '../teams/teams.service';
 
 
 @Injectable()

@@ -4,10 +4,10 @@ import { CoursesController } from './courses.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Course } from './entities/course.entity';
 import { forwardRef } from '@nestjs/common';
-import { AuthModule } from 'src/auth/auth.module';
-import { Users } from 'src/auth/entities/user.entity';
-import { Team } from 'src/teams/entities/teams.entity';
-import { TeamsModule } from 'src/teams/teams.module';
+import { AuthModule } from '../auth/auth.module';
+import { Users } from '../auth/entities/user.entity';
+import { Team } from '../teams/entities/teams.entity';
+import { TeamsModule } from '../teams/teams.module';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({

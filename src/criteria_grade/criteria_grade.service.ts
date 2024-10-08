@@ -5,8 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CriteriaGrade } from './entities/criteria_grade.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-import { CriteriaService } from 'src/criteria/criteria.service';
-import { AuthService } from 'src/auth/auth.service';
+import { CriteriaService } from '../criteria/criteria.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class CriteriaGradeService {
@@ -41,6 +41,9 @@ export class CriteriaGradeService {
 
   async update(id: string, updateCriteriaGradeDto: UpdateCriteriaGradeDto) {
     const criteriaGrade = await this.findOne(id);
+    if (!criteriaGrade) {
+      throw new NotFoundException(`Criteria grade with ID ${id} not found`);
+    }
     Object.assign(criteriaGrade, updateCriteriaGradeDto);
     return await this.criteriaGradeRepository.save(criteriaGrade);
   }

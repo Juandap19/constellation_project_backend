@@ -1,5 +1,5 @@
 import { Rubric } from '../../rubric/entities/rubric.entity';
-import { Course } from 'src/courses/entities/course.entity';
+import { Course } from '../../courses/entities/course.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity()

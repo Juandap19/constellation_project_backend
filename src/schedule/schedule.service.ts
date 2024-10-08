@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuid } from 'uuid';
 import { isUUID } from 'class-validator';
 import { NotFoundException } from '@nestjs/common';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class ScheduleService {
@@ -36,7 +36,7 @@ export class ScheduleService {
     }
 
     if(!schedule){
-      throw new NotFoundException(`Skill with the id ${id} not found`)
+      throw new NotFoundException(`Schedule with the id ${id} not found`)
     }
 
     return schedule;

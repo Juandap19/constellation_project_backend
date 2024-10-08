@@ -1,5 +1,5 @@
-import { CriteriaGrade } from "src/criteria_grade/entities/criteria_grade.entity";
-import { Rubric } from "src/rubric/entities/rubric.entity";
+import { CriteriaGrade } from "../../criteria_grade/entities/criteria_grade.entity";
+import { Rubric } from "../../rubric/entities/rubric.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -17,7 +17,7 @@ export class Criteria {
     @Column('int')
     percentage: number;
 
-    @ManyToOne(() => Rubric, (rubric) => rubric.criterias)
+    @ManyToOne(() => Rubric, (rubric) => rubric.criterias, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'rubric_id' })
     rubric: Rubric; 
 

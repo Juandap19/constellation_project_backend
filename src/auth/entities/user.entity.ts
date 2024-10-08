@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
-import { Schedule } from 'src/schedule/entities/schedule.entity';
-import { Skills } from 'src/skills/entities/skill.entity';
-import { Team } from 'src/teams/entities/teams.entity';
-import { Course } from 'src/courses/entities/course.entity';
+import { Schedule } from '../../schedule/entities/schedule.entity';
+import { Skills } from '../../skills/entities/skill.entity';
+import { Team } from '../../teams/entities/teams.entity';
+import { Course } from '../../courses/entities/course.entity';
 
 @Entity()
 export class Users {

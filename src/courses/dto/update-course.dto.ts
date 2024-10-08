@@ -6,13 +6,13 @@ export class UpdateCourseDto extends PartialType(CreateCourseDto) {
     
     @IsUUID()
     @IsOptional()
-    id: string;
+    id?: string;
   
     @IsString()
     @IsOptional()    
-    name: string;
+    name?: string;
   
     @IsUUID()
     @IsOptional()   
-    readonly users: string;
+    readonly users?: string;
 }

@@ -5,7 +5,7 @@ import { Team } from './entities/teams.entity';
 import { CreateTeamsDto } from './dto/create-teams.dto';
 import { UpdateTeamsDto } from './dto/update-teams.dto';
 import { v4 as uuid } from 'uuid';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { forwardRef } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 

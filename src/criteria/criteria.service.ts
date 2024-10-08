@@ -4,8 +4,8 @@ import { UpdateCriteriaDto } from './dto/update-criteria.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Criteria } from './entities/criteria.entity';
 import { Repository } from 'typeorm';
-import { Rubric } from 'src/rubric/entities/rubric.entity';
-import { RubricService } from 'src/rubric/rubric.service';
+import { Rubric } from '../rubric/entities/rubric.entity';
+import { RubricService } from '../rubric/rubric.service';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
@@ -17,7 +17,6 @@ export class CriteriaService {
   async create(criteria: CreateCriteriaDto) {
     const rubric = await this.rubricService.findOne(criteria.rubric);
     const newCriteria = Object.assign({...criteria, rubric, id: uuid()});
-    console.log(newCriteria);
     return await this.criteriaRepository.save(newCriteria);
   }
 
