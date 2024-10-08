@@ -21,11 +21,13 @@ export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 
   @Get()
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   async findAll() {
     return this.activityService.findAll();
   }
 
   @Get(':id')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   async findOne(@Param('id') id: string) {
     return this.activityService.findOne(id);
   }

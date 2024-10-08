@@ -17,11 +17,13 @@ export class CoursesController {
   }
 
   @Get()
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   findAll() {
     return this.coursesService.findAll();
   }
 
   @Get(':id')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   findOne(@Param('id') id: string) {
     return this.coursesService.findOne(id);
   }

@@ -16,11 +16,13 @@ export class SkillsController {
   }
 
   @Get()
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   findAll() {
     return this.skillsService.findAll();
   }
 
   @Get(':id')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   findOne(@Param('id') id: string) {
     return this.skillsService.findOne(id);
   }
