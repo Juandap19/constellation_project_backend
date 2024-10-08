@@ -26,7 +26,6 @@ export class CoursesController {
     return this.coursesService.findOne(id);
   }
 
-
   // teacher
   @Patch(':id')
   @Auth(ValidRoles.teacher)
