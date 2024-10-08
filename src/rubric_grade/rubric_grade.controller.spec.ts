@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RubricGradeController } from './rubric_grade.controller';
-import { RubricGradeModule } from './rubric_grade.module';
-import { RubricGrade } from './entities/rubric_grade.entity';
 import { RubricGradeService } from './rubric_grade.service';
 import { CreateRubricGradeDto } from './dto/create-rubric_grade.dto';
-import { NotFoundException } from '@nestjs/common';
 
 
 describe('RubricGradeController', () => {

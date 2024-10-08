@@ -3,7 +3,7 @@ import { CriteriaController } from './criteria.controller';
 import { CriteriaService } from './criteria.service';
 import { CreateCriteriaDto } from './dto/create-criteria.dto';
 import { UpdateCriteriaDto } from './dto/update-criteria.dto';
-import { Criteria } from './entities/criteria.entity';
+
 
 describe('CriteriaController', () => {
   let controller: CriteriaController;

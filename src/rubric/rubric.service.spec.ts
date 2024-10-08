@@ -7,7 +7,6 @@ import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { CreateRubricDto } from './dto/create-rubric.dto';
 import { UpdateRubricDto } from './dto/update-rubric.dto';
-import { query } from 'express';
 
 describe('RubricService', () => {
   let service: RubricService;
