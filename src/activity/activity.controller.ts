@@ -50,6 +50,12 @@ export class ActivityController {
     return this.activityService.update(id, updateActivityDto);
   }
 
+  @Get('user/:id')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
+  async getActivitiesByUser(@Param('id') id: string) {
+    return this.activityService.getActivitiesByUser(id);
+  }
+
   // teacher
   @Delete(':id')
   @Auth(ValidRoles.teacher)

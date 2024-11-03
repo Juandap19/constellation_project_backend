@@ -56,4 +56,10 @@ export class AuthController {
     return { message: 'uploaded and processed', data };
   }
 
+  @Get('students/:id')
+  @Auth(ValidRoles.teacher)
+  getStudents(@Param('id') id: string) {
+    return this.authService.getStudentsByTeacher(id);
+  }
+
 }

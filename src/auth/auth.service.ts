@@ -25,8 +25,17 @@ import { CoursesService } from '../courses/courses.service';
 export class AuthService {
 
   constructor(
-    @InjectRepository(Users) private readonly userRepository: Repository<Users>, @Inject(forwardRef(() => SkillsService)) private readonly skillsService: SkillsService, private readonly jwtService: JwtService ,  @Inject(forwardRef(() => TeamsService))private readonly teamService: TeamsService ,@Inject(forwardRef(() => CoursesService))  private readonly courseService: CoursesService 
+    @InjectRepository(Users) private readonly userRepository: Repository<Users>, @Inject(forwardRef(() => SkillsService)) private readonly skillsService: SkillsService, private readonly jwtService: JwtService ,  @Inject(forwardRef(() => TeamsService))private readonly teamService: TeamsService ,@Inject(forwardRef(() => CoursesService))  private readonly courseService: CoursesService
   ) { }
+
+  async getStudentsByTeacher(id: string) {
+    const coursesTeacher = await this.userRepository.findOne({ where: { id }, relations: ['courses'] });
+    if (!coursesTeacher) {
+      throw new NotFoundException(`Teacher with id ${id} not found`);
+    }
+    const usersInCourses = await this.userRepository.find({ where: { courses: coursesTeacher.courses, role: 'student' } });
+    return usersInCourses;
+  }
 
   async createUser(createUserDto: CreateUserDto) {
     try {

@@ -8,11 +8,13 @@ import { CoursesService } from '../courses/courses.service';
 import { CreateActivityDto } from './dto/create-activitty.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { v4 as uuid } from 'uuid';
+import { AuthService } from '../auth/auth.service';
 
 describe('ActivityService', () => {
   let service: ActivityService;
   let activityRepository: Repository<Activity>;
   let courseService: CoursesService;
+  let authService: AuthService
 
   const mockActivityRepository = {
     find: jest.fn(),
@@ -26,6 +28,10 @@ describe('ActivityService', () => {
     findOne: jest.fn(),
   };
 
+  const mockAuthService = {
+    findOne: jest.fn(),
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -37,6 +43,10 @@ describe('ActivityService', () => {
         {
           provide: CoursesService,
           useValue: mockCoursesService,
+        },
+        {
+          provide: AuthService,
+          useValue: mockAuthService,
         },
       ],
     }).compile();

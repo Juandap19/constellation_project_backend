@@ -6,12 +6,14 @@ import { CreateActivityDto } from './dto/create-activitty.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { v4 as uuid } from 'uuid';
 import { CoursesService } from '../courses/courses.service';
+import { AuthService } from '../auth/auth.service';
+import { In } from 'typeorm';
 
 @Injectable()
 export class ActivityService {
   constructor(
     @InjectRepository(Activity)
-    private readonly activityRepository: Repository<Activity>, private readonly courseService: CoursesService
+    private readonly activityRepository: Repository<Activity>, private readonly courseService: CoursesService, private readonly authService: AuthService
   ) {}
 
   async findAll() {
@@ -21,6 +23,22 @@ export class ActivityService {
     // }
     return activities;
   }
+
+  async getActivitiesByUser(id: string) {
+    const user = await this.authService.findOne(id);
+    if (!user || !user.courses) {
+        throw new NotFoundException(`User or courses not found for user with id ${id}`);
+    }
+
+    const courseIds = user.courses.map(c => c.id);
+    const activities = await this.activityRepository.find({ where: { course: { id: In(courseIds) } } });
+
+    if (activities.length === 0) {
+        throw new NotFoundException(`No activities found for user with id ${id}`);
+    }
+
+    return activities;
+}
 
   async findOne(id: string) {
     const activity = await this.activityRepository.findOne({ where: { id } });
