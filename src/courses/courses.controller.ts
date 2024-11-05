@@ -56,4 +56,11 @@ export class CoursesController {
      
   }
 
+
+  @Get('studentTeam/:studentId')
+  @Auth(ValidRoles.student)
+  studentTeam(@Param('studentId') studentId: string) {
+    return this.coursesService.findTeamByStudentId(studentId);
+  }
+
 }

@@ -320,6 +320,25 @@ export class CoursesService {
   }
 
 
+  async findTeamByStudentId(studentId: string): Promise<Team | null> {
+    const user = await this.authService.findOne(studentId);
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${studentId} not found`);
+    }
+
+    const teams = await this.teamsRepositoy.find({ relations: ['users'] });
+
+    for (const team of teams) {
+      if (team.users.some((teamUser) => teamUser.id === studentId)) {
+        return team;
+      }
+    }
+
+    return null;
+  }
+
+
 
 
 }
