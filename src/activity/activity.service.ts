@@ -27,14 +27,14 @@ export class ActivityService {
   async getActivitiesByUser(id: string) {
     const user = await this.authService.findOne(id);
     if (!user || !user.courses) {
-        throw new NotFoundException(`User or courses not found for user with id ${id}`);
+        return [];
     }
 
     const courseIds = user.courses.map(c => c.id);
     const activities = await this.activityRepository.find({ where: { course: { id: In(courseIds) } } });
 
     if (activities.length === 0) {
-        throw new NotFoundException(`No activities found for user with id ${id}`);
+        return [];
     }
 
     return activities;

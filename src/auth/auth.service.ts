@@ -30,8 +30,8 @@ export class AuthService {
 
   async getStudentsByTeacher(id: string) {
     const coursesTeacher = await this.userRepository.findOne({ where: { id }, relations: ['courses'] });
-    if (!coursesTeacher) {
-      throw new NotFoundException(`Teacher with id ${id} not found`);
+    if (!coursesTeacher || coursesTeacher.courses.length === 0) {
+      return [];
     }
     const usersInCourses = await this.userRepository.find({ where: { courses: coursesTeacher.courses, role: 'student' } });
     return usersInCourses;
