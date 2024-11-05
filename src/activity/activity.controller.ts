@@ -56,6 +56,12 @@ export class ActivityController {
     return this.activityService.getActivitiesByUser(id);
   }
 
+  @Get('course/:id')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
+  async getActivitiesByCourse(@Param('id') id: string) {
+    return this.activityService.getActivitiesByCourse(id);
+  }
+
   // teacher
   @Delete(':id')
   @Auth(ValidRoles.teacher)

@@ -11,6 +11,7 @@ import { In } from 'typeorm';
 
 @Injectable()
 export class ActivityService {
+  
   constructor(
     @InjectRepository(Activity)
     private readonly activityRepository: Repository<Activity>, private readonly courseService: CoursesService, private readonly authService: AuthService
@@ -23,6 +24,16 @@ export class ActivityService {
     // }
     return activities;
   }
+
+
+  async getActivitiesByCourse(id: string) {
+    const course = await this.courseService.findOne(id);
+    if (!course || !course.activities) {
+        return [];
+    }
+    return course.activities;
+  }
+
 
   async getActivitiesByUser(id: string) {
     const user = await this.authService.findOne(id);
