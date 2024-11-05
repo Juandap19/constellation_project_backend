@@ -23,13 +23,11 @@ export class CoursesService {
     private readonly teamService: TeamsService
   ) {}
 
-
   async create(course: CreateCourseDto) {
     const users = await this.authService.findOne(course.users);
     const newCourse = Object.assign({...course, id: uuid(), users});
     return await this.courseRepository.save(newCourse);
   }
-
 
   async addCourseToUser(courseId: string, userId: string) {
     const course = await this.courseRepository.findOne({ where: { id: courseId } });
@@ -48,7 +46,7 @@ export class CoursesService {
   }
 
   async findOne(id: string) {
-    const course = await this.courseRepository.findOne({ where: {id}, relations:['activities', 'users']});
+    const course = await this.courseRepository.findOne({ where: {id}, relations:['activities', 'users'] });
     if (!course) {
       throw new NotFoundException(`Course with id ${id} not found`);
     }

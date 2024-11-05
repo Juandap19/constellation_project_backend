@@ -23,7 +23,6 @@ export class CoursesController {
   }
 
   @Get(':id')
-  @Auth(ValidRoles.teacher, ValidRoles.student)
   findOne(@Param('id') id: string) {
     return this.coursesService.findOne(id);
   }

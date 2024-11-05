@@ -43,6 +43,12 @@ export class AuthController {
       return this.authService.loginUser(loginUserDto);
   }
 
+  @Get('course/:courseId/users')
+  @Auth(ValidRoles.teacher)
+  getUsersByCourse(@Param('courseId') courseId: string) {
+    return this.authService.getUsersByCourse(courseId);
+  }
+
   
   // teacher 
   @Post('uploadStudents/:id')

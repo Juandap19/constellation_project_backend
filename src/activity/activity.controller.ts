@@ -39,7 +39,6 @@ export class ActivityController {
     return this.activityService.create(createActivityDto);
   }
 
-
   // teacher
   @Patch(':id')
   @Auth(ValidRoles.teacher)
