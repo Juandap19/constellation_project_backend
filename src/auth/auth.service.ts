@@ -202,4 +202,14 @@ export class AuthService {
   }
 
 
+
+  async getUserSkills(userId: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['skills'] });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    return user.skills;
+  }
 }

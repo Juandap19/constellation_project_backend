@@ -62,4 +62,13 @@ export class AuthController {
     return this.authService.getStudentsByTeacher(id);
   }
 
+
+  @Get('students/skills/:id')
+  @Auth(ValidRoles.teacher)
+  getStudentsSkills(@Param('id') id: string) {
+    return this.authService.getUserSkills(id);
+  }
+
+  
+
 }
