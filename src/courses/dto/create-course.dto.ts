@@ -9,6 +9,10 @@ export class CreateCourseDto {
     @IsString()
     @IsNotEmpty({ message: 'El campo "name" no debe estar vacío.' })
     name: string;
+
+    @IsString()
+    @IsNotEmpty({ message: 'El campo "description" no debe estar vacío.' })
+    description: string;
   
     @IsUUID()
     @IsNotEmpty({ message: 'El campo "users" no debe estar vacío.' })
