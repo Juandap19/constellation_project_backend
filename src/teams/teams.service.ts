@@ -67,4 +67,16 @@ export class TeamsService {
         }
         await this.teamsRepository.delete(id);
     }
+
+    async findTeamsByCourseId(courseId: string) {
+        const teams = await this.teamsRepository.find({ where: { course: { id: courseId } }, relations: ['course', 'users'] });
+        if (!teams.length) {
+            throw new NotFoundException(`No teams found for course with id ${courseId}`);
+        }
+        return teams;
+    }
+        
+
+
+
 }

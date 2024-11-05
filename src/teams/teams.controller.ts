@@ -55,4 +55,11 @@ export class TeamsController {
   addTeamToUser(@Param('teamId') teamId: string, @Param('userId') userId: string) {
     return this.teamsService.addTeamToUser(teamId, userId);
   }
+
+  @Get('courseId/:courseId')
+  @Auth(ValidRoles.teacher)
+  teamsInCourse(@Param('courseId') courseId: string) {
+    return this.teamsService.findTeamsByCourseId(courseId);
+  }
+
 }
