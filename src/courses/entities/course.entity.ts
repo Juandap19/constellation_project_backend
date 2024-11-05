@@ -12,6 +12,9 @@ export class Course {
     
     @Column()
     name: string;
+
+    @Column()
+    description: string;
     
     @OneToMany(() => Activity, (activity) => activity.course, { cascade: true })
     activities: Activity[];
