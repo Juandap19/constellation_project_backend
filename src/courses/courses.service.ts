@@ -319,15 +319,14 @@ export class CoursesService {
     );
   }
 
-
-  async findTeamByStudentId(studentId: string): Promise<Team | null> {
+  async findTeamByStudentId(courseId: string, studentId: string): Promise<Team | null> {
     const user = await this.authService.findOne(studentId);
 
     if (!user) {
       throw new NotFoundException(`User with id ${studentId} not found`);
     }
 
-    const teams = await this.teamsRepositoy.find({ relations: ['users'] });
+    const teams = await this.teamsRepositoy.find({ where: { course: { id: courseId } }, relations: ['users'] });
 
     for (const team of teams) {
       if (team.users.some((teamUser) => teamUser.id === studentId)) {
@@ -337,8 +336,6 @@ export class CoursesService {
 
     return null;
   }
-
-
 
 
 }
