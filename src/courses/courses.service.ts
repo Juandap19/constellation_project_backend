@@ -46,7 +46,7 @@ export class CoursesService {
   }
 
   async findOne(id: string) {
-    const course = await this.courseRepository.findOne({ where: {id}, relations:['activities', 'users'] });
+    const course = await this.courseRepository.findOne({ where: {id}, relations:['activities'] });
     if (!course) {
       throw new NotFoundException(`Course with id ${id} not found`);
     }
