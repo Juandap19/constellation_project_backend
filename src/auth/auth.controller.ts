@@ -70,7 +70,7 @@ export class AuthController {
 
 
   @Get('students/skills/:id')
-  @Auth(ValidRoles.teacher)
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   getStudentsSkills(@Param('id') id: string) {
     return this.authService.getUserSkills(id);
   }
