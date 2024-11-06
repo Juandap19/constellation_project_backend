@@ -24,7 +24,7 @@ export class CoursesService {
   ) {}
 
   async create(course: CreateCourseDto) {
-    const users = await this.authService.findOne(course.users);
+    const users = await Promise.all(course.users.map(userId => this.authService.findOne(userId)));
     const newCourse = Object.assign({...course, id: uuid(), users});
     return await this.courseRepository.save(newCourse);
   }
