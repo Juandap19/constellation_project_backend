@@ -207,6 +207,15 @@ export class AuthService {
   }
 
 
+  async getUserTeams(userId: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['teams'] });
+
+    if (!user) {
+      return [];
+    }
+
+    return user.teams;
+  }
 
   async getUserSkills(userId: string) {
     const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['skills'] });

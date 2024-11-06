@@ -75,6 +75,11 @@ export class AuthController {
     return this.authService.getUserSkills(id);
   }
 
+  @Get('teams/:id')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
+  getStudentsTeams(@Param('id') id: string) {
+    return this.authService.getUserTeams(id);
+  }
   
 
 }
