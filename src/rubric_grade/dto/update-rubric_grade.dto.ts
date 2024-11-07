@@ -10,9 +10,5 @@ export class UpdateRubricGradeDto extends PartialType(CreateRubricGradeDto) {
 
     @IsUUID()
     @IsOptional()
-    readonly student: string;
-
-    @IsUUID()
-    @IsOptional()
     readonly studentEval: string;
 }

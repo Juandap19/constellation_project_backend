@@ -6,8 +6,5 @@ export class CreateRubricGradeDto {
     rubric: string;
 
     @IsUUID()
-    student: string;
-
-    @IsUUID()
     studentEval: string;
 }

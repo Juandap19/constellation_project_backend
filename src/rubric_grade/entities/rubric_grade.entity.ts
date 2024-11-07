@@ -11,9 +11,6 @@ export class RubricGrade {
     grade: number;
 
     @Column()
-    student: string;
-
-    @Column()
     studentEval: string;
 
     @ManyToOne(() => Rubric, (rubric) => rubric.rubricGrades)

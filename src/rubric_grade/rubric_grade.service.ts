@@ -22,17 +22,15 @@ export class RubricGradeService {
   async create(createRubricGradeDto: CreateRubricGradeDto) {
 
     const rubric = await this.rubricService.findOne(createRubricGradeDto.rubric);
-    const student = await this.authService.findOne(createRubricGradeDto.student);
     const studentEval = await this.authService.findOne(createRubricGradeDto.studentEval);
 
-    const { id: idStu, ...userData } = student;
     const { id: idEval, ...userDataEval } = studentEval;
   
     const grade = await this.calculateRubricGrade(idEval, rubric.id);
 
     console.log(grade);
 
-    const rubricGrade = Object.assign({...createRubricGradeDto, id: uuid(), rubric, idStu, idEval, grade});
+    const rubricGrade = Object.assign({...createRubricGradeDto, id: uuid(), rubric, idEval, grade});
     return await this.rubricGradeRepository.save(rubricGrade);
   }
 
