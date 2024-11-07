@@ -44,7 +44,7 @@ export class AuthController {
   }
 
   @Get('course/:courseId/users')
-  @Auth(ValidRoles.teacher)
+  @Auth(ValidRoles.teacher, ValidRoles.student)
   getUsersByCourse(@Param('courseId') courseId: string) {
     return this.authService.getUsersByCourse(courseId);
   }
