@@ -12,12 +12,16 @@ import { CriteriaGrade } from '../criteria_grade/entities/criteria_grade.entity'
 
 @Injectable()
 export class RubricGradeService {
-
+  
   constructor(@InjectRepository (RubricGrade) private readonly rubricGradeRepository: Repository<RubricGrade>,
   @InjectRepository(CriteriaGrade) private criteriaGradeRepository: Repository<CriteriaGrade>,
   private readonly rubricService: RubricService,
   private readonly authService: AuthService,
   ) {}
+
+  async getRubricGradesByRubricAndStudent(rubricId: string, studentId: string) {
+    return this.rubricGradeRepository.find({ where: { rubric: { id: rubricId }, studentEval: studentId } });
+  }
 
   async create(createRubricGradeDto: CreateRubricGradeDto) {
 

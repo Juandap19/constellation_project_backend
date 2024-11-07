@@ -39,4 +39,10 @@ export class RubricGradeController {
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.rubricGradeService.remove(id);
   }
+
+  @Get(':rubricId/student/:studentId')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
+  getRubricGradesByRubricAndStudent(@Param('rubricId', ParseUUIDPipe) rubricId: string, @Param('studentId', ParseUUIDPipe) studentId: string) {
+    return this.rubricGradeService.getRubricGradesByRubricAndStudent(rubricId, studentId);
+  }
 }
