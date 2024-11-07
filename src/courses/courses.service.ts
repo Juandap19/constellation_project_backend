@@ -32,6 +32,8 @@ export class CoursesService {
   async addCourseToUser(courseId: string, userId: string) {
     const course = await this.courseRepository.findOne({ where: { id: courseId } });
     const user = await this.authService.findOne(userId);
+
+    // console.log("CURSO Y ESTUDIANTE" + course, user);
     
     if (!course || !user) {
         throw new NotFoundException('course or user not found');

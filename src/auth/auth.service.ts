@@ -185,16 +185,14 @@ export class AuthService {
       let returnStudent  = null ;
 
       try {
-        console.log(!(await this.userRepository.findBy({email: student_user.email})));
-        console.log(await this.userRepository.findBy({email: student_user.email}));
-
 
         if ((await this.userRepository.findBy({ email: student_user.email })).length === 0) {
           returnStudent = await this.createUser(student_user);
         } else {
-          returnStudent = await this.userRepository.findBy({ email: student_user.email });
+          const foundStudents = await this.userRepository.findBy({ email: student_user.email });
+          returnStudent = foundStudents[0];
         }
-
+        
         await this.setStudentCourse(id, returnStudent.id);
       } catch (error) {
         console.error('Error creating user:', error);
