@@ -41,4 +41,10 @@ export class RubricController {
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.rubricService.remove(id);
   }
+
+  @Get('activity/:activityId')
+  @Auth(ValidRoles.teacher, ValidRoles.student)
+  findByActivity(@Param('activityId', ParseUUIDPipe) activityId: string) {
+    return this.rubricService.findByActivity(activityId);
+  }
 }

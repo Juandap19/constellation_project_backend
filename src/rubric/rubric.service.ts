@@ -49,6 +49,11 @@ export class RubricService {
     const rubric = await this.findOne(id);
     await this.rubricRepository.remove(rubric);
   }
+
+  async findByActivity(activityId: string) {
+    return await this.rubricRepository.find({ where: { activity: { id: activityId } }, relations: ['criterias'] });
+  }
+
 }
 
 
