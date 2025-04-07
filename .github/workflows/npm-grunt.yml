@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 'Hello World'
-      run: echo "Hello World"
-    - name: 'Dime la fecha'
-      run: date
-    - name : Muestra el contenido del Escritorio
-      run : ls -la
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+      - run: npm run build
