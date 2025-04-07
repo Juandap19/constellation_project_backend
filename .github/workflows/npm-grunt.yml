@@ -13,3 +13,7 @@ jobs:
     steps:
     - name: 'Hello World'
       run: echo "Hello World"
+    - name: 'Dime la fecha'
+      run: date
+    - name : Muestra el contenido del Escritorio
+      run : ls -la
